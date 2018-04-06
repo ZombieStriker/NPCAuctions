@@ -1,0 +1,103 @@
+1.0.26
+	Fixed issue with relogging
+
+1.0.25
+	Fixed NPC names
+
+1.0.24
+	Added fix for min and max
+
+1.0.23
+	Fixed plugin version.
+
+1.0.22
+	Fixed updater time-out error.
+
+1.0.21
+	Added potential fix to invalid items.
+
+1.0.20
+	Fixed NPE for null itemmeta
+
+1.0.19
+	Fixed Github updater
+
+1.0.18
+	Failed chat messages now print the message.
+
+1.0.17
+	Fix NPE when clicking outside of inventory
+	Fixed issue where inputs without time-codes (D, H, S) threw error
+
+1.0.16
+	Fixed Aaob Error
+	Added github updater
+
+1.0.15
+	Added support for Bukkit servers.
+
+1.0.14
+	Fixed imports
+
+1.0.13
+	Added ability to modify max time per bid.
+
+1.0.12
+	Fixed exploit with removing currency.
+
+1.0.11
+	Potentially fixed conflict with other nick-naming plugins.
+
+1.0.10
+	Added optional feature to limit auctions for each player
+	Added "npcauctions.bypasslimit"
+	Added "npcauctions.auctionlimit.#"
+
+1.0.9
+	Added optional broadcasting
+	Fixed console spamming if item does not have item meta
+
+1.0.8
+	Code cleanup
+	Fixed issue if you do not have Citizens installed.
+	Added permissions "npcauctions.create", "npcauctions.destroy", and "npcauctions.*"
+
+ 1.0.7
+	Fixed citizens error.
+	Removed some unneeded classes.
+	Cleaned up code and fixed minor bugs
+	
+ 1.0.6
+ 	Fixed npc clicking issue
+ 	Added /removeAllAuctionHouses 	
+ 	
+ 1.0.5
+ 	Added customizable text.
+ 	If Villagers are damaged, they now are removed
+ 	
+ 1.0.4
+ 	Added ability to have auctions presist between reloads
+ 	Fixed cancel auctions name
+ 	Fixed NPE when hittin non-villagers
+ 	
+ 	
+ 1.0.3
+ 	Fixed times without timestamps. Automatically defaults to minutes.
+ 	
+ 1.0.2
+ 	Adding ability to customize bidding increase
+ 	Added owner's name to auction's icon
+ 	Fixed issue with cancel auction inventory's title being longer that supported
+ 	Added item saving when rejoining
+ 	Added Buy-It-Now
+ 	
+ 1.0.1
+ 	Added customizable time limits for auctions
+ 	Added the ability to select which auction is canceled
+ 	Fixed issue with items disappearing when placed in auction house
+ 	Fixed page id issue
+ 	Fixed spacing issue for some messages
+ 	
+1.0.0
+	init post
+

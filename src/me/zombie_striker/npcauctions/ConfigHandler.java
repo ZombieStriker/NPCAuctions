@@ -54,7 +54,7 @@ public class ConfigHandler {
 				"InitialBiddingDurration"), BiddingBuy("InitialBuyItNow"), VillagersName(
 				"NPCName"), ItemNext("Item_NextPage"), ItemPrev(
 				"Item_PrevPage"), ItemAdd("Item_AddItemToAuctionHouse"), ItemCancel(
-				"Item_CancelExisitngAuction"), LoreTime(
+				"Item_CancelExisitngAuction"), IncreaseMin("Min-Increase"),IncreaseMax("Max-Increase"),LoreTime(
 				"ItemLore_Time_Remaining"), LoreBuyItNow("ItemLore_Buy_it_Now"), loreBuyItNowHow(
 				"ItemLore_Buy_Ity_Now_Message"), LoreOwner(
 				"ItemLore_Created_By"), CAnnotBidOwnAuction(

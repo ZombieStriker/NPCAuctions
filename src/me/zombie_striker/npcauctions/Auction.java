@@ -11,11 +11,11 @@ public class Auction {
 	public String ownerName;
 	public boolean ownerOnline = true;
 	public int quarterSecondsLeft;
-	public int buyitnow = -1;
+	public double buyitnow = -1;
 	public UUID lastBid;
-	public int currentPrice;
+	public double currentPrice;
 	public int auctionID = -1;
-	public int biddingPrice = 10;
+	public double biddingPrice = 10;
 
 	public Auction(ItemStack is, UUID owner, String ownername, int id) {
 		this.is = is;
