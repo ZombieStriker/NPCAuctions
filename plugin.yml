@@ -1,0 +1,25 @@
+main: me.zombie_striker.npcauctions.Main
+version: 1.0.26
+name: NPCAuctions
+commands:
+  spawnAuction:
+    description: Spawns Entity
+    aliases: [sa]
+  removeAllAuctionHouses:
+    description: Spawns Entity
+    aliases: [raah]
+  NPCAuctionEntity:
+    description: Toggles between NPC and villager
+    aliases: [npcae]
+permissions:
+  npcauctions.*:
+    description: Gives access to all NPCAuction commands
+    children:
+      npcauctions.create: true
+      npcauctions.destroy: true
+      npcauctions.bypasslimit: true
+  npcauctions.auctionlimit.1:
+    description: limits the auction to 1
+author:
+   Zombie_Striker
+softdepend: [Vault, Citizens]
