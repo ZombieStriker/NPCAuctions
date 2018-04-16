@@ -1,3 +1,6 @@
+1.0.27
+	Added /removeAuctionHouse to remove them instead of a attacking the NPC.
+
 1.0.26
 	Fixed issue with relogging
 

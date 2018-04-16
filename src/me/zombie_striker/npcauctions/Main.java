@@ -65,6 +65,8 @@ public class Main extends JavaPlugin implements Listener {
 	public static double increaseMax = 1000.0;
 
 	public static int s_MAX_BID_TIME = 24;
+	
+	public static List<UUID> removeAuctions = new ArrayList();
 
 	public static boolean enableBroadcasting = false;
 	public static String s_broadcastMessage = " %player% is auctioning %amount% %material% starting at %cost%";
@@ -221,6 +223,7 @@ public class Main extends JavaPlugin implements Listener {
 			getCommand("spawnAuction").setExecutor(new SACommand(this));
 			getCommand("NPCAuctionEntity").setExecutor(new SA2Command());
 			getCommand("removeAllAuctionHouses").setExecutor(new SA3Command());
+			getCommand("removeAuctionHouses").setExecutor(new RemoveAHCommand());
 		} catch (Error | Exception e) {
 			e.printStackTrace();
 		}

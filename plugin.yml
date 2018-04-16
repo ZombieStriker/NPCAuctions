@@ -1,13 +1,16 @@
 main: me.zombie_striker.npcauctions.Main
-version: 1.0.26
+version: 1.0.27
 name: NPCAuctions
 commands:
   spawnAuction:
     description: Spawns Entity
     aliases: [sa]
   removeAllAuctionHouses:
-    description: Spawns Entity
+    description: Removies all Entities
     aliases: [raah]
+  removeAuctionHouse:
+    description: Removes Entity
+    aliases: [rah]
   NPCAuctionEntity:
     description: Toggles between NPC and villager
     aliases: [npcae]

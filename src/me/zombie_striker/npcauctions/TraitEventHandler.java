@@ -11,6 +11,10 @@ public class TraitEventHandler implements Listener {
 	public void click(NPCRightClickEvent event) {
 		if (event.getNPC().getName().equals(Main.s_VillagerName)) {
 			event.getClicker().openInventory(Main.gui[0]);
+			if (Main.removeAuctions.contains(event.getClicker().getUniqueId())) {
+				Main.removeAuctions.remove(event.getClicker().getUniqueId());
+				event.getClicker().sendMessage(Main.prefix + " Villager removal canceled");
+			}
 		}
 	}
 
@@ -19,9 +23,11 @@ public class TraitEventHandler implements Listener {
 		if (event.getNPC().getName().equals(Main.s_VillagerName)) {
 			if (event.getClicker().hasPermission("npcauctions.destroy")
 					&& (!(event.getNPC().getEntity() instanceof Villager))) {
-				event.getNPC().destroy();
-				event.getClicker().sendMessage(
-						Main.prefix + " NPC has been removed.");
+				if (Main.removeAuctions.contains(event.getClicker().getUniqueId())) {
+					Main.removeAuctions.remove(event.getClicker().getUniqueId());
+					event.getNPC().destroy();
+					event.getClicker().sendMessage(Main.prefix + " NPC has been removed.");
+				}
 			}
 		}
 	}

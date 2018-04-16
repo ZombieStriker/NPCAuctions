@@ -40,13 +40,20 @@ public class VillagerAuction implements Listener {
 					.equalsIgnoreCase(Main.s_VillagerName)) {
 				if (!e.getDamager().hasPermission("npcauctions.destroy")) {
 					e.setCancelled(true);
-				} else {
+				} else if(Main.removeAuctions.contains(e.getDamager().getUniqueId())){
+					Main.removeAuctions.remove(e.getDamager().getUniqueId());
 					e.getEntity().remove();
 					if (e.getDamager() instanceof Player) {
 						if (e.getEntity() instanceof Villager)
 							((Player) e.getDamager()).sendMessage(Main.prefix
 									+ " Villager has been removed");
 					}
+				}else {
+					Main.removeAuctions.remove(e.getDamager().getUniqueId());
+					if (e.getDamager() instanceof Player) 
+						if (e.getEntity() instanceof Villager)
+							((Player) e.getDamager()).sendMessage(Main.prefix
+									+ " Villager removal canceled");
 				}
 			}
 	}
