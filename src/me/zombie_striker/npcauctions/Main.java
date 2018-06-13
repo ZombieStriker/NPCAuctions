@@ -60,12 +60,12 @@ public class Main extends JavaPlugin implements Listener {
 	public static String s_cannotbidown = "&c You cannot bid on your own auction!";
 	public static String s_buyitnowoptional = "If NOT, type in \"No\" ";
 	public static String s_buyitnowset = " Set the Buy-It_now to $%price%";
-	
+
 	public static double increaseMin = 1.0;
 	public static double increaseMax = 1000.0;
 
 	public static int s_MAX_BID_TIME = 24;
-	
+
 	public static List<UUID> removeAuctions = new ArrayList();
 
 	public static boolean enableBroadcasting = false;
@@ -139,20 +139,25 @@ public class Main extends JavaPlugin implements Listener {
 			@Override
 			public void run() {
 				if (!setupEconomy()) {
-					getLogger().severe("- Disabled due to no Vault not being found!");
+					getLogger().severe("- Disabled due to no Vault or no economy being found!");
 					getServer().getPluginManager().disablePlugin(m);
-					Bukkit.broadcastMessage(prefix + "Shutting down due to missng Vault dependancy");
+					Bukkit.broadcastMessage(prefix + "Shutting down due to missng Vault dependancy (OR YOU ARE MISSING A PLUGIN THAT ADDS THE ECONOMY, NOT VAULT)");
 					return;
 				}
 			}
 		}.runTaskLater(this, 20);
-
-		if (getServer().getPluginManager().getPlugin("Citizens") == null
-				|| getServer().getPluginManager().getPlugin("Citizens").isEnabled() == false) {
-			getLogger().log(Level.SEVERE, "Citizens 2.0 not found or not enabled");
-			USE_VILLAGERS = true;
+		if (getConfig().contains("UseVillager")) {
+			USE_VILLAGERS = getConfig().getBoolean("UseVillager");
 		} else {
-			USE_VILLAGERS = false;
+			if (getServer().getPluginManager().getPlugin("Citizens") == null
+					|| getServer().getPluginManager().getPlugin("Citizens").isEnabled() == false) {
+				getLogger().log(Level.SEVERE, "Citizens 2.0 not found or not enabled");
+				USE_VILLAGERS = true;
+			} else {
+				USE_VILLAGERS = false;
+			}
+			getConfig().set("UseVillager", USE_VILLAGERS);
+			saveConfig();
 		}
 		ConfigHandler c = null;
 		try {
@@ -192,10 +197,9 @@ public class Main extends JavaPlugin implements Listener {
 
 			enableBroadcasting = Boolean.valueOf(c.getMessage(Keys.broadcastAuction, enableBroadcasting + ""));
 			s_broadcastMessage = c.getMessage(Keys.broadcastAuctionMesssage, s_broadcastMessage);
-			
 
-			increaseMax= Double.parseDouble(c.getMessage(Keys.IncreaseMax ,increaseMax+""));
-			increaseMin = Double.parseDouble(c.getMessage(Keys.IncreaseMin, increaseMin+""));
+			increaseMax = Double.parseDouble(c.getMessage(Keys.IncreaseMax, increaseMax + ""));
+			increaseMin = Double.parseDouble(c.getMessage(Keys.IncreaseMin, increaseMin + ""));
 			try {
 
 				s_MAX_BID_TIME = Integer.parseInt(c.getMessage(Keys.MAX_HOURS, s_MAX_BID_TIME + ""));
@@ -220,10 +224,10 @@ public class Main extends JavaPlugin implements Listener {
 		}
 
 		try {
-			getCommand("spawnAuction").setExecutor(new SACommand(this));
-			getCommand("NPCAuctionEntity").setExecutor(new SA2Command());
-			getCommand("removeAllAuctionHouses").setExecutor(new SA3Command());
-			getCommand("removeAuctionHouses").setExecutor(new RemoveAHCommand());
+			getCommand("spawnAuction").setExecutor(new SpawnNPCCommand(this));
+			getCommand("NPCAuctionEntity").setExecutor(new UseVillagerSwapCommand(this));
+			getCommand("removeAllAuctionHouses").setExecutor(new DestroyCommand());
+			getCommand("removeAuctionHouse").setExecutor(new RemoveAHCommand());
 		} catch (Error | Exception e) {
 			e.printStackTrace();
 		}
@@ -409,7 +413,8 @@ public class Main extends JavaPlugin implements Listener {
 						i = -i;
 					auctionWaitingMap.get(e.getPlayer().getUniqueId()).currentPrice = i;
 					auctionWaitingStage.put(e.getPlayer().getUniqueId(), 1);
-					e.getPlayer().sendMessage(prefix + s_BidIncrease.replaceAll("%min%", increaseMin+"").replaceAll("%max%",increaseMax+""));
+					e.getPlayer().sendMessage(prefix + s_BidIncrease.replaceAll("%min%", increaseMin + "")
+							.replaceAll("%max%", increaseMax + ""));
 				} catch (Exception e2) {
 					e.getPlayer().sendMessage(prefix + s_cancelUnfinAuction + "  : " + e.getMessage());
 					e.getPlayer().getInventory().addItem(auctionWaitingMap.get(e.getPlayer().getUniqueId()).is);

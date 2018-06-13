@@ -1,3 +1,10 @@
+1.0.29
+	Added UseVillager to the config, so the viller setting can be perminant
+	Fixed imports
+
+1.0.28
+	Fixed /removeAuctionHouse 's name.
+
 1.0.27
 	Added /removeAuctionHouse to remove them instead of a attacking the NPC.
 
