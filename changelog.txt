@@ -1,3 +1,9 @@
+1.0.31
+	Added Blacklist
+
+1.0.30
+	Fixed NPCs so they can't be damaged.
+
 1.0.29
 	Added UseVillager to the config, so the viller setting can be perminant
 	Fixed imports

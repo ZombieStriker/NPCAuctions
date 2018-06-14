@@ -60,7 +60,7 @@ public class ConfigHandler {
 				"ItemLore_Created_By"), CAnnotBidOwnAuction(
 				"CancelCannotBidOwnAuction"), BuyIUtNowNo(
 				"Buy_It_Now_Optional_Say_No"), BuyItNowSetTo(
-				"Buy_It_Now_Price_Set"),MAX_HOURS(
+				"Buy_It_Now_Price_Set"),Blacklisted("BlacklistedMaterial"),MAX_HOURS(
 						"MaximumHoursForBids"),OutBid(
 						"OutBid"),broadcastAuction("BroacastAuctionOnSubmit"),broadcastAuctionMesssage("BroacastAuctionOnSubmitMessage"),limitAuctions("EnableAuctionLimitPerPlayer"),overlimit("AuctionLimitReached");
 		public String s;

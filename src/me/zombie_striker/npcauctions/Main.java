@@ -60,13 +60,14 @@ public class Main extends JavaPlugin implements Listener {
 	public static String s_cannotbidown = "&c You cannot bid on your own auction!";
 	public static String s_buyitnowoptional = "If NOT, type in \"No\" ";
 	public static String s_buyitnowset = " Set the Buy-It_now to $%price%";
+	public static String s_blacklistedmaterial = "&c %material% is not allowed to be auctioned!";
 
 	public static double increaseMin = 1.0;
 	public static double increaseMax = 1000.0;
 
 	public static int s_MAX_BID_TIME = 24;
 
-	public static List<UUID> removeAuctions = new ArrayList();
+	public static List<UUID> removeAuctions = new ArrayList<UUID>();
 
 	public static boolean enableBroadcasting = false;
 	public static String s_broadcastMessage = " %player% is auctioning %amount% %material% starting at %cost%";
@@ -87,6 +88,7 @@ public class Main extends JavaPlugin implements Listener {
 	public static Economy econ = null;
 
 	public List<Auction> auctions = new ArrayList<>();
+	public List<BlackListedItem> blacklist = new ArrayList<BlackListedItem>();
 
 	public HashMap<UUID, Auction> auctionWaitingMap = new HashMap<>();
 
@@ -200,6 +202,10 @@ public class Main extends JavaPlugin implements Listener {
 
 			increaseMax = Double.parseDouble(c.getMessage(Keys.IncreaseMax, increaseMax + ""));
 			increaseMin = Double.parseDouble(c.getMessage(Keys.IncreaseMin, increaseMin + ""));
+			
+
+			s_blacklistedmaterial= c.getMessage(Keys.Blacklisted, s_blacklistedmaterial);
+			
 			try {
 
 				s_MAX_BID_TIME = Integer.parseInt(c.getMessage(Keys.MAX_HOURS, s_MAX_BID_TIME + ""));
@@ -280,8 +286,31 @@ public class Main extends JavaPlugin implements Listener {
 					auctions.add(a);
 				}
 			}
-
 		getConfig().set("Auctions", null);
+		if (!getConfig().contains("Blacklist")) {
+			List<String> k = new ArrayList<String>();
+			k.add("BEDROCK");
+			k.add(Material.ENDER_PORTAL_FRAME.name()+"");
+			getConfig().set("Blacklist", k);
+		}else {
+			for (String blacklist : getConfig().getStringList("Blacklist")) {	
+				try {
+				String[] parts = blacklist.split(":");
+				String mat = parts[0];
+				Material material = Material.BEDROCK;
+				short data = 0;
+				if(parts.length >1)
+					data = Short.parseShort(parts[1]);
+				try {
+					material = Material.matchMaterial(mat);
+				}catch(Error|Exception e4) {
+					material = Material.getMaterial(Integer.parseInt(mat));
+				}
+				BlackListedItem bli = new BlackListedItem(material, data);
+				this.blacklist.add(bli);
+				}catch(Error|Exception r5) {}
+			}
+		}
 		saveConfig();
 
 		Bukkit.getPluginManager().registerEvents(this, this);
@@ -739,6 +768,16 @@ public class Main extends JavaPlugin implements Listener {
 				slotis = e.getView().getBottomInventory().getItem(e.getSlot());
 			}
 			if (itemnull) {
+
+				for (BlackListedItem bli : blacklist) {
+					if (bli.getMat() == slotis.getType()
+							&& (bli.getData() == -1 || bli.getData() == slotis.getDurability())) {
+						e.getWhoClicked().sendMessage(s_blacklistedmaterial);
+						e.setCancelled(true);
+						return;
+					}
+				}
+
 				Auction a = new Auction(slotis, e.getWhoClicked().getUniqueId(), e.getWhoClicked().getName(),
 						(int) (Math.random() * 99999));
 				e.getWhoClicked().getInventory().setItem(e.getWhoClicked().getInventory().first(slotis), null);

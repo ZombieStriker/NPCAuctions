@@ -20,8 +20,7 @@ public class VillagerAuction implements Listener {
 	public void interact(final PlayerInteractAtEntityEvent e) {
 		if (e.getRightClicked() instanceof Villager) {
 			if (e.getRightClicked().getCustomName() != null)
-				if (e.getRightClicked().getCustomName()
-						.equalsIgnoreCase(Main.s_VillagerName)) {
+				if (e.getRightClicked().getCustomName().equalsIgnoreCase(Main.s_VillagerName)) {
 					new BukkitRunnable() {
 						@Override
 						public void run() {
@@ -36,31 +35,28 @@ public class VillagerAuction implements Listener {
 	@EventHandler
 	public void onhit(EntityDamageByEntityEvent e) {
 		if (e.getEntity().getCustomName() != null)
-			if (e.getEntity().getCustomName()
-					.equalsIgnoreCase(Main.s_VillagerName)) {
+			if (e.getEntity().getCustomName().equalsIgnoreCase(Main.s_VillagerName)) {
+				if (!(e.getDamager() instanceof Player)) {
+					e.setCancelled(true);
+					return;
+				}
 				if (!e.getDamager().hasPermission("npcauctions.destroy")) {
 					e.setCancelled(true);
-				} else if(Main.removeAuctions.contains(e.getDamager().getUniqueId())){
+				} else if (Main.removeAuctions.contains(e.getDamager().getUniqueId())) {
 					Main.removeAuctions.remove(e.getDamager().getUniqueId());
 					e.getEntity().remove();
-					if (e.getDamager() instanceof Player) {
-						if (e.getEntity() instanceof Villager)
-							((Player) e.getDamager()).sendMessage(Main.prefix
-									+ " Villager has been removed");
-					}
-				}else {
+					if (e.getEntity() instanceof Villager)
+						((Player) e.getDamager()).sendMessage(Main.prefix + " Villager has been removed");
+				} else {
 					Main.removeAuctions.remove(e.getDamager().getUniqueId());
-					if (e.getDamager() instanceof Player) 
-						if (e.getEntity() instanceof Villager)
-							((Player) e.getDamager()).sendMessage(Main.prefix
-									+ " Villager removal canceled");
+					if (e.getEntity() instanceof Villager)
+						((Player) e.getDamager()).sendMessage(Main.prefix + " Villager removal canceled");
 				}
 			}
 	}
 
 	public static Entity spawnVillager(Location loc) {
-		Villager v = (Villager) loc.getWorld().spawnEntity(loc,
-				EntityType.VILLAGER);
+		Villager v = (Villager) loc.getWorld().spawnEntity(loc, EntityType.VILLAGER);
 		v.setAdult();
 		v.setAI(false);
 		v.setSilent(true);
