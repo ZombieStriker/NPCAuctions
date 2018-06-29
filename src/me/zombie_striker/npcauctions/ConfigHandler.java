@@ -52,7 +52,7 @@ public class ConfigHandler {
 				"AuctionEndedSold"), NoBids("AuctionEndedNoBids"), BidIncrease(
 				"InitialIncreaseBidding"), BiddingStart("InitialStarttingBid"), BiddingDur(
 				"InitialBiddingDurration"), BiddingBuy("InitialBuyItNow"), VillagersName(
-				"NPCName"), ItemNext("Item_NextPage"), ItemPrev(
+				"NPCName"), ItemNext("Item_NextPage"), someonebid("someoneBid"),ItemPrev(
 				"Item_PrevPage"), ItemAdd("Item_AddItemToAuctionHouse"), ItemCancel(
 				"Item_CancelExisitngAuction"), IncreaseMin("Min-Increase"),IncreaseMax("Max-Increase"),LoreTime(
 				"ItemLore_Time_Remaining"), LoreBuyItNow("ItemLore_Buy_it_Now"), loreBuyItNowHow(

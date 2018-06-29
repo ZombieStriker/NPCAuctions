@@ -45,6 +45,7 @@ public class Main extends JavaPlugin implements Listener {
 	public static String s_cancelGen = " Canceling auction...";
 	public static String s_cancelOwn = " You cant bid on your own auction!";
 	public static String s_outBid = " You have been outbid!";
+	public static String s_someoneBid = "%player% has bid %amount% for your %item% auction";
 
 	public static String s_VillagerName = "&6[AuctionHouse]";
 
@@ -68,6 +69,8 @@ public class Main extends JavaPlugin implements Listener {
 	public static int s_MAX_BID_TIME = 24;
 
 	public static List<UUID> removeAuctions = new ArrayList<UUID>();
+
+	public static HashMap<UUID, Location> tpbackto = new HashMap<UUID, Location>();
 
 	public static boolean enableBroadcasting = false;
 	public static String s_broadcastMessage = " %player% is auctioning %amount% %material% starting at %cost%";
@@ -96,6 +99,8 @@ public class Main extends JavaPlugin implements Listener {
 
 	public static boolean USE_VILLAGERS = true;
 
+	public static Main instance;
+
 	public static final int TICK_SPEED = 5;
 
 	private boolean setupEconomy() {
@@ -109,19 +114,23 @@ public class Main extends JavaPlugin implements Listener {
 		econ = rsp.getProvider();
 		return econ != null;
 	}
+	public void saveAuctionNoSave(Auction a) {
+
+		getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID + "." + "price", a.currentPrice);
+		getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID + "." + "buyitnow", a.buyitnow);
+		getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID + "." + "increase", a.biddingPrice);
+		if (a.lastBid != null)
+			getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID + "." + "lastbidder",
+					a.lastBid.toString());
+		getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID + "." + "timeleft",
+				a.quarterSecondsLeft);
+		getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID + "." + "item", a.is);
+	}
 
 	@Override
 	public void onDisable() {
 		for (Auction a : auctions) {
-			getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID + "." + "price", a.currentPrice);
-			getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID + "." + "buyitnow", a.buyitnow);
-			getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID + "." + "increase", a.biddingPrice);
-			if (a.lastBid != null)
-				getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID + "." + "lastbidder",
-						a.lastBid.toString());
-			getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID + "." + "timeleft",
-					a.quarterSecondsLeft);
-			getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID + "." + "item", a.is);
+			saveAuctionNoSave(a);
 		}
 		saveConfig();
 	}
@@ -130,12 +139,7 @@ public class Main extends JavaPlugin implements Listener {
 	@Override
 	public void onEnable() {
 		final Main m = this;
-
-		try {
-			Bukkit.getPluginManager().registerEvents(new TraitEventHandler(), this);
-		} catch (Exception | Error e) {
-		}
-
+		instance = m;
 		new BukkitRunnable() {
 
 			@Override
@@ -143,7 +147,8 @@ public class Main extends JavaPlugin implements Listener {
 				if (!setupEconomy()) {
 					getLogger().severe("- Disabled due to no Vault or no economy being found!");
 					getServer().getPluginManager().disablePlugin(m);
-					Bukkit.broadcastMessage(prefix + "Shutting down due to missng Vault dependancy (OR YOU ARE MISSING A PLUGIN THAT ADDS THE ECONOMY, NOT VAULT)");
+					Bukkit.broadcastMessage(prefix
+							+ "Shutting down due to missng Vault dependancy (OR YOU ARE MISSING A PLUGIN THAT ADDS THE ECONOMY, NOT VAULT)");
 					return;
 				}
 			}
@@ -161,6 +166,11 @@ public class Main extends JavaPlugin implements Listener {
 			getConfig().set("UseVillager", USE_VILLAGERS);
 			saveConfig();
 		}
+		if (!USE_VILLAGERS)
+			try {
+				Bukkit.getPluginManager().registerEvents(new TraitEventHandler(), this);
+			} catch (Exception | Error e) {
+			}
 		ConfigHandler c = null;
 		try {
 			c = ConfigHandler.init(this);
@@ -183,6 +193,7 @@ public class Main extends JavaPlugin implements Listener {
 
 			s_VillagerName = c.getMessage(Keys.VillagersName, s_VillagerName);
 			s_outBid = c.getMessage(Keys.OutBid, s_outBid);
+			s_someoneBid= c.getMessage(Keys.someonebid, s_someoneBid);
 
 			s_ItemAdd = c.getMessage(Keys.ItemAdd, s_ItemAdd);
 			s_ItemRemove = c.getMessage(Keys.ItemCancel, s_ItemRemove);
@@ -202,10 +213,9 @@ public class Main extends JavaPlugin implements Listener {
 
 			increaseMax = Double.parseDouble(c.getMessage(Keys.IncreaseMax, increaseMax + ""));
 			increaseMin = Double.parseDouble(c.getMessage(Keys.IncreaseMin, increaseMin + ""));
-			
 
-			s_blacklistedmaterial= c.getMessage(Keys.Blacklisted, s_blacklistedmaterial);
-			
+			s_blacklistedmaterial = c.getMessage(Keys.Blacklisted, s_blacklistedmaterial);
+
 			try {
 
 				s_MAX_BID_TIME = Integer.parseInt(c.getMessage(Keys.MAX_HOURS, s_MAX_BID_TIME + ""));
@@ -230,10 +240,9 @@ public class Main extends JavaPlugin implements Listener {
 		}
 
 		try {
-			getCommand("spawnAuction").setExecutor(new SpawnNPCCommand(this));
-			getCommand("NPCAuctionEntity").setExecutor(new UseVillagerSwapCommand(this));
-			getCommand("removeAllAuctionHouses").setExecutor(new DestroyCommand());
-			getCommand("removeAuctionHouse").setExecutor(new RemoveAHCommand());
+			NPCAuctionCommand npcc = new NPCAuctionCommand(this);
+			getCommand("NPCAuction").setExecutor(npcc);
+			getCommand("NPCAuction").setTabCompleter(npcc);
 		} catch (Error | Exception e) {
 			e.printStackTrace();
 		}
@@ -286,29 +295,39 @@ public class Main extends JavaPlugin implements Listener {
 					auctions.add(a);
 				}
 			}
-		getConfig().set("Auctions", null);
+		//getConfig().set("Auctions", null);
+
+		if (getConfig().contains("NPCS"))
+			for (String npcuuids : getConfig().getConfigurationSection("NPCS").getKeys(false)) {
+				try {
+					tpbackto.put(UUID.fromString(npcuuids), (Location) getConfig().get("NPCS." + npcuuids));
+				} catch (Error | Exception e34) {
+				}
+			}
+
 		if (!getConfig().contains("Blacklist")) {
 			List<String> k = new ArrayList<String>();
 			k.add("BEDROCK");
-			k.add(Material.ENDER_PORTAL_FRAME.name()+"");
+			k.add(Material.ENDER_PORTAL_FRAME.name() + "");
 			getConfig().set("Blacklist", k);
-		}else {
-			for (String blacklist : getConfig().getStringList("Blacklist")) {	
+		} else {
+			for (String blacklist : getConfig().getStringList("Blacklist")) {
 				try {
-				String[] parts = blacklist.split(":");
-				String mat = parts[0];
-				Material material = Material.BEDROCK;
-				short data = 0;
-				if(parts.length >1)
-					data = Short.parseShort(parts[1]);
-				try {
-					material = Material.matchMaterial(mat);
-				}catch(Error|Exception e4) {
-					material = Material.getMaterial(Integer.parseInt(mat));
+					String[] parts = blacklist.split(":");
+					String mat = parts[0];
+					Material material = Material.BEDROCK;
+					short data = 0;
+					if (parts.length > 1)
+						data = Short.parseShort(parts[1]);
+					try {
+						material = Material.matchMaterial(mat);
+					} catch (Error | Exception e4) {
+						material = Material.getMaterial(Integer.parseInt(mat));
+					}
+					BlackListedItem bli = new BlackListedItem(material, data);
+					this.blacklist.add(bli);
+				} catch (Error | Exception r5) {
 				}
-				BlackListedItem bli = new BlackListedItem(material, data);
-				this.blacklist.add(bli);
-				}catch(Error|Exception r5) {}
 			}
 		}
 		saveConfig();
@@ -348,8 +367,12 @@ public class Main extends JavaPlugin implements Listener {
 
 	}
 
-	@SuppressWarnings("unchecked")
 	public void win(Auction a) {
+		win(a, false);
+	}
+
+	@SuppressWarnings("unchecked")
+	public void win(Auction a, boolean withBuyItNow) {
 		OfflinePlayer creator = Bukkit.getOfflinePlayer(a.owner);
 		if (a.lastBid == null) {
 			if (creator.isOnline()) {
@@ -369,11 +392,17 @@ public class Main extends JavaPlugin implements Listener {
 			// TODO: Commenting out. In order to make sure the user cant spend
 			// this money elsewhere after they bid, the money will be
 			// automatically removed when they bid.
-			econ.depositPlayer(creator, a.currentPrice);
-
+			
+			econ.depositPlayer(creator, withBuyItNow?a.buyitnow:a.currentPrice);
+			getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID , null);
+			saveConfig();
 			if (lastbid.isOnline()) {
 				((Player) lastbid).sendMessage(prefix + s_WonAuction);
-				((Player) lastbid).getInventory().addItem(a.is);
+				if (((Player) lastbid).getInventory().firstEmpty() == -1) {
+					((Player) lastbid).getWorld().dropItem(((Player) lastbid).getLocation(), a.is).setPickupDelay(0);
+				} else {
+					((Player) lastbid).getInventory().addItem(a.is);
+				}
 			} else {
 				List<ItemStack> items = (List<ItemStack>) getConfig().get(a.owner.toString() + ".recievedItems");
 				if (items == null)
@@ -383,7 +412,8 @@ public class Main extends JavaPlugin implements Listener {
 				saveConfig();
 			}
 			if (creator.isOnline()) {
-				((Player) creator).sendMessage(prefix + s_WonEarning.replaceAll("%price%", a.currentPrice + ""));
+				((Player) creator).sendMessage(prefix
+						+ s_WonEarning.replaceAll("%price%", withBuyItNow ? a.buyitnow + "" : a.currentPrice + ""));
 			}
 		}
 	}
@@ -533,6 +563,8 @@ public class Main extends JavaPlugin implements Listener {
 				auctionWaitingMap.remove(e.getPlayer().getUniqueId());
 				auctionWaitingStage.remove(e.getPlayer().getUniqueId());
 				e.getPlayer().sendMessage(prefix + s_addedToAuctionHouse);
+				saveAuctionNoSave(aa);
+				saveConfig();
 				if (enableBroadcasting) {
 					Bukkit.broadcastMessage(prefix + s_broadcastMessage.replaceAll("%player%", e.getPlayer().getName())
 							.replaceAll("%amount%", "" + aa.is.getAmount())
@@ -672,15 +704,20 @@ public class Main extends JavaPlugin implements Listener {
 										}
 										if (aa.lastBid != null) {
 											OfflinePlayer ofp = Bukkit.getOfflinePlayer(aa.lastBid);
-											econ.depositPlayer(ofp, aa.currentPrice);
+											econ.depositPlayer(ofp, aa.buyitnow);
 											if (ofp.isOnline()) {
 												((Player) ofp).sendMessage(prefix + s_outBid);
 											}
 										}
+										Player ofowner = Bukkit.getPlayer(aa.owner);
+										if(ofowner!=null) {
+											ofowner.sendMessage(prefix+s_someoneBid.replace("%player%", e.getWhoClicked().getName()).replace("%amount%", ""+aa.buyitnow).replace("%item%", (aa.is.getItemMeta().hasDisplayName()?aa.is.getItemMeta().getDisplayName():aa.is.getType().name())+".x."+aa.is.getAmount()));
+										}
+										//public static String s_someoneBid = "%player% has bid %amount% for your %item% auction";
 
 										aa.lastBid = e.getWhoClicked().getUniqueId();
 										econ.withdrawPlayer(((Player) e.getWhoClicked()), aa.buyitnow);
-										win(aa);
+										win(aa, true);
 										auctions.remove(aa);
 									}
 									return;
@@ -743,6 +780,8 @@ public class Main extends JavaPlugin implements Listener {
 						e.getWhoClicked().sendMessage(prefix + s_cancelGen);
 						e.getWhoClicked().getInventory().addItem(aa.is);
 						auctions.remove(aa);
+						getConfig().set("Auctions." + aa.owner.toString() + "." + aa.auctionID , null);
+						saveConfig();
 					}
 				}
 			} catch (Exception e2) {

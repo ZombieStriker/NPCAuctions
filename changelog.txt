@@ -1,3 +1,18 @@
+1.0.35
+	Added message for owner of auction to see who bid on it.
+	Added support to keep auctions in the config while server is running. Should help prevent auctions from being lost upon crashes.
+	All new auctions will now be saved to the config upon creation. Will help in case server crashes. 
+
+1.0.34
+	Added fix for fire damage
+
+1.0.33
+	Quick fix: Messages for the amount bought for buy-it-now has been corrected.
+	Fixed if inventory is full, item will be dropped at player's feet
+1.0.32
+	Code rework: Added /NPCAutcions command to replcae all of the other commands
+	Added /npcauctions respawn.
+
 1.0.31
 	Added Blacklist
 
