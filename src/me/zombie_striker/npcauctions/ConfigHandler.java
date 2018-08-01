@@ -16,8 +16,7 @@ public class ConfigHandler {
 			config.set(k.s, def);
 			return ChatColor.translateAlternateColorCodes('&', def);
 		}
-		return ChatColor.translateAlternateColorCodes('&',
-				config.getString(k.s));
+		return ChatColor.translateAlternateColorCodes('&', config.getString(k.s));
 	}
 
 	public static ConfigHandler init(Main main) {
@@ -44,7 +43,7 @@ public class ConfigHandler {
 	public enum Keys {
 		NoPerm("NoPerm"), Title("MainTitle"), AddedToAuc("AddedToAuctionHouse"), CancelAuctionInv(
 				"CancelAuctionInvTitle"), AddAuctionInv("AddNewAuctionInvTitle"), CancelGen(
-				"CancelAuctionGeneralMessage"), CancelAuctionInvalid(
+				"CancelAuctionGeneralMessage"),CancelAuctionInvalid(
 				"CancelAuctionInvalidInput"), CancelAuctionExisting(
 				"CancelExistingAuctionBecauseItsUnfinished"), CancelOwn(
 				"CancelBidBecauseItsThePlayers"), AddAuc(
@@ -60,8 +59,8 @@ public class ConfigHandler {
 				"ItemLore_Created_By"), CAnnotBidOwnAuction(
 				"CancelCannotBidOwnAuction"), BuyIUtNowNo(
 				"Buy_It_Now_Optional_Say_No"), BuyItNowSetTo(
-				"Buy_It_Now_Price_Set"),Blacklisted("BlacklistedMaterial"),MAX_HOURS(
-						"MaximumHoursForBids"),OutBid(
+				"Buy_It_Now_Price_Set"),rejoin_items("PlayerRejoinRecievesItems"), rejoin_amount("PlayerRejoinRecievesMoney"),Blacklisted("BlacklistedMaterial"),MAX_HOURS(
+						"MaximumHoursForBids"),CANNOTBIDALRADYBID("AlreadyPlacedBid"),HIGHESTBIDDER("HighestBidder"),OutBid(
 						"OutBid"),broadcastAuction("BroacastAuctionOnSubmit"),broadcastAuctionMesssage("BroacastAuctionOnSubmitMessage"),limitAuctions("EnableAuctionLimitPerPlayer"),overlimit("AuctionLimitReached");
 		public String s;
 

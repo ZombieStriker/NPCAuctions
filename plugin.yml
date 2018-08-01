@@ -1,6 +1,7 @@
 main: me.zombie_striker.npcauctions.Main
-version: 1.0.36
+version: 1.0.39
 name: NPCAuctions
+api-version: 1.13
 commands:
   NPCAuction:
     description: Toggles between NPC and villager

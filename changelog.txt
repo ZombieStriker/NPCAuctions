@@ -1,3 +1,14 @@
+1.0.39
+	Added messages for if player recieves money or items whne offline
+
+1.0.38
+	Fixed npe
+
+1.0.37
+	Added support for showing last bidder
+	Fixed so players cannot bid on self
+1.0.36
+	Fixed config-sync so auctions that end will be removed from config.
 1.0.35
 	Added message for owner of auction to see who bid on it.
 	Added support to keep auctions in the config while server is running. Should help prevent auctions from being lost upon crashes.

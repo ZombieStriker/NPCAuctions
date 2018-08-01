@@ -44,7 +44,11 @@ public class Main extends JavaPlugin implements Listener {
 	public static String s_cancelExisting = " Canceling existing auction.";
 	public static String s_cancelGen = " Canceling auction...";
 	public static String s_cancelOwn = " You cant bid on your own auction!";
+	public static String s_cancelAlreadyBid = " You are the highest bidder on this auction!";
+	public static String s_highestBidder = " Highest Bidder: %player%";
 	public static String s_outBid = " You have been outbid!";
+	public static String s_rejoin_amount = " Since the last time you were on, you have recieved $%amount%!";
+	public static String s_rejoin_items = " The following auctions had no bidders: ";
 	public static String s_someoneBid = "%player% has bid %amount% for your %item% auction";
 
 	public static String s_VillagerName = "&6[AuctionHouse]";
@@ -63,6 +67,7 @@ public class Main extends JavaPlugin implements Listener {
 	public static String s_buyitnowset = " Set the Buy-It_now to $%price%";
 	public static String s_blacklistedmaterial = "&c %material% is not allowed to be auctioned!";
 
+	public static boolean enableViewLastBid = false;
 	public static double increaseMin = 1.0;
 	public static double increaseMax = 1000.0;
 
@@ -114,6 +119,7 @@ public class Main extends JavaPlugin implements Listener {
 		econ = rsp.getProvider();
 		return econ != null;
 	}
+
 	public void saveAuctionNoSave(Auction a) {
 
 		getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID + "." + "price", a.currentPrice);
@@ -122,8 +128,7 @@ public class Main extends JavaPlugin implements Listener {
 		if (a.lastBid != null)
 			getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID + "." + "lastbidder",
 					a.lastBid.toString());
-		getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID + "." + "timeleft",
-				a.quarterSecondsLeft);
+		getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID + "." + "timeleft", a.quarterSecondsLeft);
 		getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID + "." + "item", a.is);
 	}
 
@@ -135,7 +140,6 @@ public class Main extends JavaPlugin implements Listener {
 		saveConfig();
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public void onEnable() {
 		final Main m = this;
@@ -191,9 +195,14 @@ public class Main extends JavaPlugin implements Listener {
 			s_WonAuction = c.getMessage(Keys.WonAuction, s_WonAuction);
 			s_WonEarning = c.getMessage(Keys.WonAucEarn, s_WonEarning);
 
+			s_cancelAlreadyBid = c.getMessage(Keys.CANNOTBIDALRADYBID, s_cancelAlreadyBid);
+			s_highestBidder = c.getMessage(Keys.HIGHESTBIDDER, s_highestBidder);
+
 			s_VillagerName = c.getMessage(Keys.VillagersName, s_VillagerName);
 			s_outBid = c.getMessage(Keys.OutBid, s_outBid);
-			s_someoneBid= c.getMessage(Keys.someonebid, s_someoneBid);
+			s_someoneBid = c.getMessage(Keys.someonebid, s_someoneBid);
+			s_rejoin_amount = c.getMessage(Keys.rejoin_amount, s_rejoin_amount);
+			s_rejoin_items = c.getMessage(Keys.rejoin_items, s_rejoin_items);
 
 			s_ItemAdd = c.getMessage(Keys.ItemAdd, s_ItemAdd);
 			s_ItemRemove = c.getMessage(Keys.ItemCancel, s_ItemRemove);
@@ -247,26 +256,26 @@ public class Main extends JavaPlugin implements Listener {
 			e.printStackTrace();
 		}
 
-		bufferstack = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.GRAY.getWoolData());
+		bufferstack = QuickMaterialConversionClass.getGrayStained();
 		ItemMeta im = bufferstack.getItemMeta();
 		im.setDisplayName(" ");
 		bufferstack.setItemMeta(im);
 
-		nextpage = new ItemStack(Material.WOOL, 1, DyeColor.GREEN.getWoolData());
+		nextpage = QuickMaterialConversionClass.getGreenWool();
 		ItemMeta im2 = nextpage.getItemMeta();
 		im2.setDisplayName(s_ItemNex);
 		nextpage.setItemMeta(im2);
 
-		prevpage = new ItemStack(Material.WOOL, 1, DyeColor.RED.getWoolData());
+		prevpage = QuickMaterialConversionClass.getRedWool();
 		ItemMeta im3 = prevpage.getItemMeta();
 		im3.setDisplayName(s_ItemPrev);
 		prevpage.setItemMeta(im3);
 
-		addAuc = new ItemStack(Material.WOOL, 1, DyeColor.BLUE.getWoolData());
+		addAuc = QuickMaterialConversionClass.getBlueWool();
 		ItemMeta im4 = addAuc.getItemMeta();
 		im4.setDisplayName(s_ItemAdd);
 		addAuc.setItemMeta(im4);
-		cancelAuc = new ItemStack(Material.WOOL, 1, DyeColor.RED.getWoolData());
+		cancelAuc = QuickMaterialConversionClass.getRedWool();
 		ItemMeta im5 = cancelAuc.getItemMeta();
 		im5.setDisplayName(s_ItemRemove);
 		cancelAuc.setItemMeta(im5);
@@ -295,7 +304,7 @@ public class Main extends JavaPlugin implements Listener {
 					auctions.add(a);
 				}
 			}
-		//getConfig().set("Auctions", null);
+		// getConfig().set("Auctions", null);
 
 		if (getConfig().contains("NPCS"))
 			for (String npcuuids : getConfig().getConfigurationSection("NPCS").getKeys(false)) {
@@ -305,10 +314,15 @@ public class Main extends JavaPlugin implements Listener {
 				}
 			}
 
+		if (!getConfig().contains("EnableViewLastBidder")) {
+			getConfig().set("EnableViewLastBidder", false);
+			enableViewLastBid = false;
+		} else {
+			enableViewLastBid = getConfig().getBoolean("EnableViewLastBidder");
+		}
 		if (!getConfig().contains("Blacklist")) {
 			List<String> k = new ArrayList<String>();
 			k.add("BEDROCK");
-			k.add(Material.ENDER_PORTAL_FRAME.name() + "");
 			getConfig().set("Blacklist", k);
 		} else {
 			for (String blacklist : getConfig().getStringList("Blacklist")) {
@@ -322,7 +336,7 @@ public class Main extends JavaPlugin implements Listener {
 					try {
 						material = Material.matchMaterial(mat);
 					} catch (Error | Exception e4) {
-						material = Material.getMaterial(Integer.parseInt(mat));
+						//material = Material.getMaterial(Integer.parseInt(mat));
 					}
 					BlackListedItem bli = new BlackListedItem(material, data);
 					this.blacklist.add(bli);
@@ -345,8 +359,11 @@ public class Main extends JavaPlugin implements Listener {
 					}
 				}
 				if (ending.size() > 0) {
-					for (Auction a : ending)
+					for (Auction a : ending) {
+						getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID, null);
+						saveConfig();
 						auctions.remove(a);
+					}
 					ending.clear();
 				}
 				for (int i = 0; i < 20; i++)
@@ -392,9 +409,16 @@ public class Main extends JavaPlugin implements Listener {
 			// TODO: Commenting out. In order to make sure the user cant spend
 			// this money elsewhere after they bid, the money will be
 			// automatically removed when they bid.
-			
-			econ.depositPlayer(creator, withBuyItNow?a.buyitnow:a.currentPrice);
-			getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID , null);
+
+			econ.depositPlayer(creator, withBuyItNow ? a.buyitnow : a.currentPrice);
+			if(!creator.isOnline()) {
+				double i = (withBuyItNow ? a.buyitnow : a.currentPrice);
+				if(getConfig().contains(a.owner.toString() + ".offlineAmount"))
+					i+=getConfig().getDouble(a.owner.toString() + ".offlineAmount");
+				getConfig().set(a.owner.toString() + ".offlineAmount", i);
+				saveConfig();				
+			}
+			getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID, null);
 			saveConfig();
 			if (lastbid.isOnline()) {
 				((Player) lastbid).sendMessage(prefix + s_WonAuction);
@@ -449,11 +473,22 @@ public class Main extends JavaPlugin implements Listener {
 			@SuppressWarnings("unchecked")
 			@Override
 			public void run() {
+				if(getConfig().contains(e.getPlayer().getUniqueId().toString() + ".offlineAmount")) {
+					e.getPlayer().sendMessage(prefix+s_rejoin_amount.replace("%amount%", ""+getConfig().getDouble(e.getPlayer().getUniqueId().toString() + ".offlineAmount")));
+				}
 				if (getConfig().contains(e.getPlayer().getUniqueId().toString() + ".recievedItems")) {
 					List<ItemStack> items = (List<ItemStack>) getConfig()
 							.get(e.getPlayer().getUniqueId().toString() + ".recievedItems");
-					for (ItemStack is : items)
+					StringBuilder sb = new StringBuilder();
+					for (ItemStack is : items) {
 						e.getPlayer().getInventory().addItem(is);
+						if(is.hasItemMeta()&&is.getItemMeta().hasDisplayName()) {
+							sb.append("\""+is.getItemMeta().getDisplayName()+"\", ");
+						}else {
+							sb.append(is.getType().name()+(is.getAmount()>1?":"+is.getAmount():"")+", ");
+						}
+					}
+					e.getPlayer().sendMessage(prefix+s_rejoin_items+sb.toString());
 					getConfig().set(e.getPlayer().getUniqueId().toString() + ".recievedItems", null);
 					saveConfig();
 				}
@@ -694,6 +729,8 @@ public class Main extends JavaPlugin implements Listener {
 						}
 						if (aa.owner.equals(e.getWhoClicked().getUniqueId())) {
 							e.getWhoClicked().sendMessage(prefix + s_cannotbidown);
+						} else if (aa.lastBid != null && aa.lastBid.equals(e.getWhoClicked().getUniqueId())) {
+							e.getWhoClicked().sendMessage(prefix + s_cancelAlreadyBid);
 						} else {
 							if (aa.hasBuyItNow()) {
 								if (e.isRightClick()) {
@@ -710,10 +747,17 @@ public class Main extends JavaPlugin implements Listener {
 											}
 										}
 										Player ofowner = Bukkit.getPlayer(aa.owner);
-										if(ofowner!=null) {
-											ofowner.sendMessage(prefix+s_someoneBid.replace("%player%", e.getWhoClicked().getName()).replace("%amount%", ""+aa.buyitnow).replace("%item%", (aa.is.getItemMeta().hasDisplayName()?aa.is.getItemMeta().getDisplayName():aa.is.getType().name())+".x."+aa.is.getAmount()));
+										if (ofowner != null) {
+											ofowner.sendMessage(prefix
+													+ s_someoneBid.replace("%player%", e.getWhoClicked().getName())
+															.replace("%amount%", "" + aa.buyitnow).replace("%item%",
+																	(aa.is.getItemMeta().hasDisplayName()
+																			? aa.is.getItemMeta().getDisplayName()
+																			: aa.is.getType().name()) + ".x."
+																			+ aa.is.getAmount()));
 										}
-										//public static String s_someoneBid = "%player% has bid %amount% for your %item% auction";
+										// public static String s_someoneBid = "%player% has bid %amount% for your
+										// %item% auction";
 
 										aa.lastBid = e.getWhoClicked().getUniqueId();
 										econ.withdrawPlayer(((Player) e.getWhoClicked()), aa.buyitnow);
@@ -780,7 +824,7 @@ public class Main extends JavaPlugin implements Listener {
 						e.getWhoClicked().sendMessage(prefix + s_cancelGen);
 						e.getWhoClicked().getInventory().addItem(aa.is);
 						auctions.remove(aa);
-						getConfig().set("Auctions." + aa.owner.toString() + "." + aa.auctionID , null);
+						getConfig().set("Auctions." + aa.owner.toString() + "." + aa.auctionID, null);
 						saveConfig();
 					}
 				}
@@ -836,6 +880,7 @@ public class Main extends JavaPlugin implements Listener {
 				e.setCancelled(true);
 		}
 	}
+	
 
 	public ItemStack c(Auction a) {
 		ItemStack temp = a.is.clone();
@@ -869,6 +914,9 @@ public class Main extends JavaPlugin implements Listener {
 
 		lore.add((a.quarterSecondsLeft / TICK_SPEED < 60 ? ChatColor.RED : ChatColor.GOLD) + s_loretime + time2);
 		lore.add((a.ownerOnline ? ChatColor.GREEN : ChatColor.RED) + s_loreowner + a.ownerName);
+		if (enableViewLastBid)
+			if (a.lastBid != null)
+				lore.add(s_highestBidder.replace("%player%", Bukkit.getOfflinePlayer(a.lastBid).getName()));
 		if (a.is != null && a.is.hasItemMeta() && a.is.getItemMeta().hasLore())
 			lore.addAll(a.is.getItemMeta().getLore());
 		if (temp2 != null) {
