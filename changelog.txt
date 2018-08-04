@@ -1,3 +1,11 @@
+1.0.41
+	Added message for if the auction has been canceled
+	Fixed bug where money is not refunded if auction is canceled
+	
+
+1.0.40
+	Fixed bid message if auction does not have buy-it-now
+
 1.0.39
 	Added messages for if player recieves money or items whne offline
 
