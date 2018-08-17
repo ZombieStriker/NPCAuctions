@@ -26,7 +26,7 @@ public class Auction {
 
 	public boolean tickAuc() {
 		quarterSecondsLeft--;
-		return quarterSecondsLeft == 0;
+		return quarterSecondsLeft <= 0;
 	}
 
 	public void setWait(int ticks) {

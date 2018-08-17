@@ -1,7 +1,20 @@
+1.0.44b
+	Added fix for price when broadcasting the auction.
+
+1.0.44
+	Added fix if timer is negitive
+	Added /npca open to open the auction house
+
+1.0.43
+	Fixed winning condition if player's inventory is full
+
+1.0.42
+	Fixed bidding message
+
 1.0.41
 	Added message for if the auction has been canceled
 	Fixed bug where money is not refunded if auction is canceled
-	
+	Fixed negative number for amounts
 
 1.0.40
 	Fixed bid message if auction does not have buy-it-now

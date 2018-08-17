@@ -47,8 +47,12 @@ public class NPCAuctionCommand implements CommandExecutor, TabExecutor {
 			} else {
 				sender.sendMessage(Main.prefix + ChatColor.RED + Main.s_NOPERM);
 			}
+		} else if (args[0].equalsIgnoreCase("open")) {
+			if (sender instanceof Player)
+				((Player) sender).openInventory(Main.gui[0]);
+
 		} else if (args[0].equalsIgnoreCase("respawn")) {
-			for (Entry<UUID, Location> k : m.tpbackto.entrySet()) {
+			for (Entry<UUID, Location> k : Main.tpbackto.entrySet()) {
 				for (Entity e : k.getValue().getWorld().getEntities()) {
 					if (e.getUniqueId().equals(k.getKey())) {
 						e.teleport(k.getValue());
@@ -57,7 +61,7 @@ public class NPCAuctionCommand implements CommandExecutor, TabExecutor {
 				}
 				VillagerAuction.spawnVillager(k.getValue());
 			}
-			sender.sendMessage(m.prefix + " all NPCS are back at their spawn locations");
+			sender.sendMessage(Main.prefix + " all NPCS are back at their spawn locations");
 
 		} else if (args[0].equalsIgnoreCase("usevillagers")) {
 
@@ -128,6 +132,7 @@ public class NPCAuctionCommand implements CommandExecutor, TabExecutor {
 		s.sendMessage("/npca usevillagers: Toggles whether CitizensNPCs or villagers are used.");
 		s.sendMessage("/npca removenpc : Allows the user to remove villagers");
 		s.sendMessage("/npca respawn: In case villagers despawn, use this to readd them");
+		s.sendMessage("/npca open: Opens the auction house.");
 	}
 
 	@Override
@@ -139,6 +144,7 @@ public class NPCAuctionCommand implements CommandExecutor, TabExecutor {
 			k.add("usevillagers");
 			k.add("removenpc");
 			k.add("respawn");
+			k.add("open");
 			return k;
 		}
 		return null;
