@@ -1,5 +1,5 @@
 main: me.zombie_striker.npcauctions.Main
-version: 1.0.44
+version: 1.0.45
 name: NPCAuctions
 api-version: 1.13
 commands:

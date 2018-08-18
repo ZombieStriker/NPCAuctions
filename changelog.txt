@@ -1,3 +1,8 @@
+1.0.45
+	Fixed issue where villager opening menu would not open correctly.
+	Fixed issue where "TraitHandler" can be enabled even without citizens2 enabled.
+	Added "autoUpdate" to configure if the server should auto update the plugin.
+
 1.0.44b
 	Added fix for price when broadcasting the auction.
 

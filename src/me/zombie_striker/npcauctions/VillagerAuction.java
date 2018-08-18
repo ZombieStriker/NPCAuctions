@@ -8,6 +8,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class VillagerAuction implements Listener {
 
@@ -16,7 +17,13 @@ public class VillagerAuction implements Listener {
 		if (e.getRightClicked() instanceof Villager) {
 			if (e.getRightClicked().getCustomName() != null)
 				if (e.getRightClicked().getCustomName().equalsIgnoreCase(Main.s_VillagerName)) {
-					e.getPlayer().openInventory(Main.gui[0]);
+					new BukkitRunnable() {
+						@Override
+						public void run() {
+							e.getPlayer().openInventory(Main.gui[0]);
+						}
+					}.runTaskLater(Main.instance, 1);
+					//e.getPlayer().openInventory(Main.gui[0]);
 					e.setCancelled(true);
 				}
 		}

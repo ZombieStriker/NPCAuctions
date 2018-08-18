@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 
 import me.zombie_striker.npcauctions.ConfigHandler.Keys;
 import net.milkbowl.vault.economy.Economy;
+import net.minecraft.server.v1_13_R1.AdvancementProgress.a;
 
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -168,15 +169,14 @@ public class Main extends JavaPlugin implements Listener {
 				USE_VILLAGERS = true;
 			} else {
 				USE_VILLAGERS = false;
+				try {
+					Bukkit.getPluginManager().registerEvents(new TraitEventHandler(), this);
+				} catch (Exception | Error e) {
+				}
 			}
 			getConfig().set("UseVillager", USE_VILLAGERS);
 			saveConfig();
 		}
-		if (!USE_VILLAGERS)
-			try {
-				Bukkit.getPluginManager().registerEvents(new TraitEventHandler(), this);
-			} catch (Exception | Error e) {
-			}
 		ConfigHandler c = null;
 		try {
 			c = ConfigHandler.init(this);
@@ -318,6 +318,10 @@ public class Main extends JavaPlugin implements Listener {
 				}
 			}
 
+		if (!getConfig().contains("autoUpdate")) {
+			getConfig().set("autoUpdate", true);
+			saveConfig();
+		}
 		if (!getConfig().contains("EnableViewLastBidder")) {
 			getConfig().set("EnableViewLastBidder", false);
 			enableViewLastBid = false;
@@ -383,7 +387,8 @@ public class Main extends JavaPlugin implements Listener {
 					"PluginConstructorAPI", "PluginConstructorAPI.jar");
 
 		new Metrics(this);
-		GithubUpdater.autoUpdate(this, "ZombieStriker", "NPCAuctions", "NPCAuctions.jar");
+		if (getConfig().getBoolean("autoUpdate"))
+			GithubUpdater.autoUpdate(this, "ZombieStriker", "NPCAuctions", "NPCAuctions.jar");
 		// new Updater(this, 277093, getConfig().getBoolean("auto-update"));
 
 	}
@@ -490,7 +495,7 @@ public class Main extends JavaPlugin implements Listener {
 							.get(e.getPlayer().getUniqueId().toString() + ".recievedItems");
 					StringBuilder sb = new StringBuilder();
 					for (ItemStack is : items) {
-						if(e.getPlayer().getInventory().firstEmpty()==-1) {
+						if (e.getPlayer().getInventory().firstEmpty() == -1) {
 							e.getPlayer().getWorld().dropItem(e.getPlayer().getLocation(), is);
 						} else {
 							e.getPlayer().getInventory().addItem(is);
