@@ -1,3 +1,7 @@
+1.0.46
+	Added npcauctions.default PERM
+	Added npcauctions.openGUIFromCommand PERM. Now you are able to disable the player from being able to use gui command in different worlds
+
 1.0.45
 	Fixed issue where villager opening menu would not open correctly.
 	Fixed issue where "TraitHandler" can be enabled even without citizens2 enabled.

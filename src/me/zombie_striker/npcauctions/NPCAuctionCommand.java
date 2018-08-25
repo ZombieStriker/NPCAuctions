@@ -48,6 +48,7 @@ public class NPCAuctionCommand implements CommandExecutor, TabExecutor {
 				sender.sendMessage(Main.prefix + ChatColor.RED + Main.s_NOPERM);
 			}
 		} else if (args[0].equalsIgnoreCase("open")) {
+			if(sender.hasPermission("npcauctions.openGUIFromCommand"))
 			if (sender instanceof Player)
 				((Player) sender).openInventory(Main.gui[0]);
 

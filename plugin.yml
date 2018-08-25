@@ -1,5 +1,5 @@
 main: me.zombie_striker.npcauctions.Main
-version: 1.0.45
+version: 1.0.46
 name: NPCAuctions
 api-version: 1.13
 commands:
@@ -13,8 +13,14 @@ permissions:
       npcauctions.create: true
       npcauctions.destroy: true
       npcauctions.bypasslimit: true
+      npcauctions.default: true
   npcauctions.auctionlimit.1:
     description: limits the auction to 1
+  npcauctions.default:
+    default: true
+    description: Gives access to all PixelPrinter commands
+    children:
+      npcauctions.openGUIFromCommand: true
 author:
    Zombie_Striker
 softdepend: [Vault, Citizens]
