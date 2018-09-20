@@ -1,3 +1,9 @@
+1.0.47
+	Fixed issue where offline-amount is not displaying the correct amount
+	Fixed issue where offline-amount would stack amount.
+	Fixed "someone bid" message to include the amount bid, not just the total amount
+	Added someone bought message for when buy-it-now is used.
+
 1.0.46
 	Added npcauctions.default PERM
 	Added npcauctions.openGUIFromCommand PERM. Now you are able to disable the player from being able to use gui command in different worlds

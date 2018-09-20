@@ -12,7 +12,6 @@ import java.util.regex.Pattern;
 
 import me.zombie_striker.npcauctions.ConfigHandler.Keys;
 import net.milkbowl.vault.economy.Economy;
-import net.minecraft.server.v1_13_R1.AdvancementProgress.a;
 
 import org.bukkit.*;
 import org.bukkit.entity.Player;
@@ -50,7 +49,8 @@ public class Main extends JavaPlugin implements Listener {
 	public static String s_outBid = " You have been outbid!";
 	public static String s_rejoin_amount = " Since the last time you were on, you have recieved $%amount%!";
 	public static String s_rejoin_items = " The following auctions had no bidders: ";
-	public static String s_someoneBid = "%player% has bid %amount% for your %item% auction";
+	public static String s_someoneBid = "%player% has bid $%bid% ($%amount%) for your %item% auction";
+	public static String s_someoneBought = "%player% has bought you %item% auction for $%amount%.";
 	public static String s_youBid = "You have has bid %amount% for the %item% auction";
 	public static String s_auctionCancelRefund = "The owner of the %item% auction canceled the auction. You have been refunded $%amount%.";
 
@@ -203,6 +203,7 @@ public class Main extends JavaPlugin implements Listener {
 			s_VillagerName = c.getMessage(Keys.VillagersName, s_VillagerName);
 			s_outBid = c.getMessage(Keys.OutBid, s_outBid);
 			s_someoneBid = c.getMessage(Keys.someonebid, s_someoneBid);
+			s_someoneBought = c.getMessage(Keys.someonebought, s_someoneBought);
 			s_youBid = c.getMessage(Keys.youbid, s_youBid);
 			s_auctionCancelRefund = c.getMessage(Keys.refundCanceled, s_auctionCancelRefund);
 			s_rejoin_amount = c.getMessage(Keys.rejoin_amount, s_rejoin_amount);
@@ -486,9 +487,12 @@ public class Main extends JavaPlugin implements Listener {
 			@SuppressWarnings("unchecked")
 			@Override
 			public void run() {
+				boolean save = false;
 				if (getConfig().contains(e.getPlayer().getUniqueId().toString() + ".offlineAmount")) {
 					e.getPlayer().sendMessage(prefix + s_rejoin_amount.replace("%amount%",
 							"" + getConfig().getDouble(e.getPlayer().getUniqueId().toString() + ".offlineAmount")));
+					getConfig().set(e.getPlayer().getUniqueId().toString() + ".offlineAmount", null);
+					save = true;
 				}
 				if (getConfig().contains(e.getPlayer().getUniqueId().toString() + ".recievedItems")) {
 					List<ItemStack> items = (List<ItemStack>) getConfig()
@@ -508,8 +512,10 @@ public class Main extends JavaPlugin implements Listener {
 					}
 					e.getPlayer().sendMessage(prefix + s_rejoin_items + sb.toString());
 					getConfig().set(e.getPlayer().getUniqueId().toString() + ".recievedItems", null);
-					saveConfig();
+					save = true;
 				}
+				if(save)
+					saveConfig();
 			}
 		}.runTaskLater(this, 2);
 	}
@@ -641,6 +647,7 @@ public class Main extends JavaPlugin implements Listener {
 				a.ownerOnline = false;
 	}
 
+	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onClick(InventoryClickEvent e) {
 		try {
@@ -772,7 +779,7 @@ public class Main extends JavaPlugin implements Listener {
 										Player ofowner = Bukkit.getPlayer(aa.owner);
 										if (ofowner != null) {
 											ofowner.sendMessage(prefix
-													+ s_someoneBid.replace("%player%", e.getWhoClicked().getName())
+													+ s_someoneBought.replace("%player%", e.getWhoClicked().getName())
 															.replace("%amount%", "" + aa.buyitnow).replace("%item%",
 																	(aa.is.getItemMeta().hasDisplayName()
 																			? aa.is.getItemMeta().getDisplayName()
@@ -810,7 +817,7 @@ public class Main extends JavaPlugin implements Listener {
 								if (ofowner != null) {
 									ofowner.sendMessage(prefix + s_someoneBid
 											.replace("%player%", e.getWhoClicked().getName())
-											.replace("%amount%", "" + aa.currentPrice).replace("%item%",
+											.replace("%amount%", "" + aa.currentPrice).replace("%bid%", ""+aa.biddingPrice).replace("%item%",
 													(aa.is.getItemMeta().hasDisplayName()
 															? aa.is.getItemMeta().getDisplayName()
 															: aa.is.getType().name()) + ".x." + aa.is.getAmount()));
