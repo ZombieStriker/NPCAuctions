@@ -1,3 +1,7 @@
+1.0.48
+	Added fix for 1.13 Auction houses NPCs.
+	Added ability to customize buttons.
+
 1.0.47
 	Fixed issue where offline-amount is not displaying the correct amount
 	Fixed issue where offline-amount would stack amount.

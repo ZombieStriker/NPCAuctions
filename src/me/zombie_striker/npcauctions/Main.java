@@ -50,7 +50,7 @@ public class Main extends JavaPlugin implements Listener {
 	public static String s_rejoin_amount = " Since the last time you were on, you have recieved $%amount%!";
 	public static String s_rejoin_items = " The following auctions had no bidders: ";
 	public static String s_someoneBid = "%player% has bid $%bid% ($%amount%) for your %item% auction";
-	public static String s_someoneBought = "%player% has bought you %item% auction for $%amount%.";
+	public static String s_someoneBought = "%player% has bought your %item% auction for $%amount%.";
 	public static String s_youBid = "You have has bid %amount% for the %item% auction";
 	public static String s_auctionCancelRefund = "The owner of the %item% auction canceled the auction. You have been refunded $%amount%.";
 
@@ -169,13 +169,18 @@ public class Main extends JavaPlugin implements Listener {
 				USE_VILLAGERS = true;
 			} else {
 				USE_VILLAGERS = false;
-				try {
-					Bukkit.getPluginManager().registerEvents(new TraitEventHandler(), this);
-				} catch (Exception | Error e) {
-				}
 			}
 			getConfig().set("UseVillager", USE_VILLAGERS);
 			saveConfig();
+		}
+		if(!USE_VILLAGERS) {
+			try {
+				Bukkit.getPluginManager().registerEvents(new TraitEventHandler(), this);
+			} catch (Exception | Error e) {
+				getLogger().log(Level.SEVERE, "Citizens 2.0 not found or not enabled");
+				e.printStackTrace();
+				USE_VILLAGERS = true;
+			}
 		}
 		ConfigHandler c = null;
 		try {
@@ -261,26 +266,26 @@ public class Main extends JavaPlugin implements Listener {
 			e.printStackTrace();
 		}
 
-		bufferstack = QuickMaterialConversionClass.getGrayStained();
+		bufferstack = this.getConfigItemStack("NoItemSlot", QuickMaterialConversionClass.getGrayStained());
 		ItemMeta im = bufferstack.getItemMeta();
 		im.setDisplayName(" ");
 		bufferstack.setItemMeta(im);
 
-		nextpage = QuickMaterialConversionClass.getGreenWool();
+		nextpage = this.getConfigItemStack("NextPageIcon",QuickMaterialConversionClass.getGreenWool());
 		ItemMeta im2 = nextpage.getItemMeta();
 		im2.setDisplayName(s_ItemNex);
 		nextpage.setItemMeta(im2);
 
-		prevpage = QuickMaterialConversionClass.getRedWool();
+		prevpage = this.getConfigItemStack("PrevPageIcon",QuickMaterialConversionClass.getRedWool());
 		ItemMeta im3 = prevpage.getItemMeta();
 		im3.setDisplayName(s_ItemPrev);
 		prevpage.setItemMeta(im3);
 
-		addAuc = QuickMaterialConversionClass.getBlueWool();
+		addAuc = this.getConfigItemStack("AddAuctionIcon",QuickMaterialConversionClass.getGreenWool());
 		ItemMeta im4 = addAuc.getItemMeta();
 		im4.setDisplayName(s_ItemAdd);
 		addAuc.setItemMeta(im4);
-		cancelAuc = QuickMaterialConversionClass.getRedWool();
+		cancelAuc = this.getConfigItemStack("CancelAuctionIcon",QuickMaterialConversionClass.getRedWool());
 		ItemMeta im5 = cancelAuc.getItemMeta();
 		im5.setDisplayName(s_ItemRemove);
 		cancelAuc.setItemMeta(im5);
@@ -514,7 +519,7 @@ public class Main extends JavaPlugin implements Listener {
 					getConfig().set(e.getPlayer().getUniqueId().toString() + ".recievedItems", null);
 					save = true;
 				}
-				if(save)
+				if (save)
 					saveConfig();
 			}
 		}.runTaskLater(this, 2);
@@ -817,7 +822,8 @@ public class Main extends JavaPlugin implements Listener {
 								if (ofowner != null) {
 									ofowner.sendMessage(prefix + s_someoneBid
 											.replace("%player%", e.getWhoClicked().getName())
-											.replace("%amount%", "" + aa.currentPrice).replace("%bid%", ""+aa.biddingPrice).replace("%item%",
+											.replace("%amount%", "" + aa.currentPrice)
+											.replace("%bid%", "" + aa.biddingPrice).replace("%item%",
 													(aa.is.getItemMeta().hasDisplayName()
 															? aa.is.getItemMeta().getDisplayName()
 															: aa.is.getType().name()) + ".x." + aa.is.getAmount()));
@@ -988,5 +994,19 @@ public class Main extends JavaPlugin implements Listener {
 				online.getInventory().addItem(a.is);
 		}
 		return temp;
+	}
+
+	@SuppressWarnings("deprecation")
+	public ItemStack getConfigItemStack(String pathname, ItemStack base) {
+		if(getConfig().contains("Items."+pathname+".Material")) {
+			Material m = Material.matchMaterial(getConfig().getString("Items."+pathname+".Material"));
+			short durib = (short) getConfig().getInt("Items."+pathname+".data");
+			ItemStack is = new ItemStack(m,1,durib);
+			return is;
+		}
+		getConfig().set("Items."+pathname+".Material", base.getType().name());
+		getConfig().set("Items."+pathname+".data", base.getDurability());
+		saveConfig();
+		return base;
 	}
 }
