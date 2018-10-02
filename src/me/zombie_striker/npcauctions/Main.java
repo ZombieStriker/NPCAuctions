@@ -31,14 +31,14 @@ public class Main extends JavaPlugin implements Listener {
 	public static String s_NOPERM = "&6 You do not have permission to use this command";
 	public static String s_Title = ChatColor.AQUA + "[" + ChatColor.WHITE + "Auction House" + ChatColor.AQUA + "]";
 	public static String s_InvTitleCancel = " Cancel which auction?";
-	public static String s_InvTitleAdd = " What do you want to auction?";
-	public static String s_AuctionEneededNoBids = " Your auction ended. No one bid.";
-	public static String s_WonAuction = " You have won the Auction!";
+	public static String s_InvTitleAdd = " Which item would you like to auction off?";
+	public static String s_AuctionEneededNoBids = " Your %item% auction ended. No one bid.";
+	public static String s_WonAuction = " You have won the %item% Auction!";
 	public static String s_WonEarning = " Your auction ended, earning you $%price%.";
-	public static String s_BidIncrease = " What will be the bid increase? (Min:$%min%, Max:$%max%)";
+	public static String s_BidIncrease = " By how much will the bidding increase? (Min:$%min%, Max:$%max%)";
 	public static String s_BidStarting = " What would be the starting bid?";
-	public static String s_BidDurration = " And how long should the auction last? (Using the format hoursH minutesM secondsS)";
-	public static String s_BidBuyItNow = "[OPTIONAL] Do you want a Buy-It-Now for your item? If so, type in the price. ";
+	public static String s_BidDurration = " How long should the auction last? (Using the format hoursH minutesM secondsS)";
+	public static String s_BidBuyItNow = "[OPTIONAL] Do you want a Buy-It-Now for your item? If so, type in a valid the price.";
 	public static String s_addedToAuctionHouse = " Added the auction to the auction house.";
 	public static String s_cancelUnfinAuction = " Canceling Auction: Invalid input.";
 	public static String s_cancelExisting = " Canceling existing auction.";
@@ -46,12 +46,13 @@ public class Main extends JavaPlugin implements Listener {
 	public static String s_cancelOwn = " You cant bid on your own auction!";
 	public static String s_cancelAlreadyBid = " You are the highest bidder on this auction!";
 	public static String s_highestBidder = " Highest Bidder: %player%";
-	public static String s_outBid = " You have been outbid!";
+	public static String s_outBid = " You have been outbid for the %item% auction!";
 	public static String s_rejoin_amount = " Since the last time you were on, you have recieved $%amount%!";
 	public static String s_rejoin_items = " The following auctions had no bidders: ";
 	public static String s_someoneBid = "%player% has bid $%bid% ($%amount%) for your %item% auction";
 	public static String s_someoneBought = "%player% has bought your %item% auction for $%amount%.";
-	public static String s_youBid = "You have has bid %amount% for the %item% auction";
+	public static String s_youBid = "You have bid $%bid% ($%amount%) for the %item% auction";
+	public static String s_youBought = "You have bought the %item% auction for $%amount%.";
 	public static String s_auctionCancelRefund = "The owner of the %item% auction canceled the auction. You have been refunded $%amount%.";
 
 	public static String s_VillagerName = "&6[AuctionHouse]";
@@ -210,6 +211,7 @@ public class Main extends JavaPlugin implements Listener {
 			s_someoneBid = c.getMessage(Keys.someonebid, s_someoneBid);
 			s_someoneBought = c.getMessage(Keys.someonebought, s_someoneBought);
 			s_youBid = c.getMessage(Keys.youbid, s_youBid);
+			s_youBought = c.getMessage(Keys.youbought, s_youBought);
 			s_auctionCancelRefund = c.getMessage(Keys.refundCanceled, s_auctionCancelRefund);
 			s_rejoin_amount = c.getMessage(Keys.rejoin_amount, s_rejoin_amount);
 			s_rejoin_items = c.getMessage(Keys.rejoin_items, s_rejoin_items);
@@ -408,7 +410,10 @@ public class Main extends JavaPlugin implements Listener {
 		OfflinePlayer creator = Bukkit.getOfflinePlayer(a.owner);
 		if (a.lastBid == null) {
 			if (creator.isOnline()) {
-				((Player) creator).sendMessage(prefix + s_AuctionEneededNoBids);
+				((Player) creator).sendMessage(prefix + s_AuctionEneededNoBids.replace("%item%",
+						(a.is.getItemMeta().hasDisplayName()
+								? a.is.getItemMeta().getDisplayName()
+								: a.is.getType().name()) + ".x." + a.is.getAmount()));
 				if (((Player) creator).getInventory().firstEmpty() == -1) {
 					((Player) creator).getWorld().dropItem(((Player) creator).getLocation(), a.is);
 				} else {
@@ -440,7 +445,10 @@ public class Main extends JavaPlugin implements Listener {
 			getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID, null);
 			saveConfig();
 			if (lastbid.isOnline()) {
-				((Player) lastbid).sendMessage(prefix + s_WonAuction);
+				((Player) lastbid).sendMessage(prefix + s_WonAuction.replace("%item%",
+						(a.is.getItemMeta().hasDisplayName()
+								? a.is.getItemMeta().getDisplayName()
+								: a.is.getType().name()) + ".x." + a.is.getAmount()));
 				if (((Player) lastbid).getInventory().firstEmpty() == -1) {
 					((Player) lastbid).getWorld().dropItem(((Player) lastbid).getLocation(), a.is);
 				} else {
@@ -778,7 +786,11 @@ public class Main extends JavaPlugin implements Listener {
 											OfflinePlayer ofp = Bukkit.getOfflinePlayer(aa.lastBid);
 											econ.depositPlayer(ofp, aa.buyitnow);
 											if (ofp.isOnline()) {
-												((Player) ofp).sendMessage(prefix + s_outBid);
+												((Player) ofp).sendMessage(prefix + s_outBid.replace("%item%",
+														(aa.is.getItemMeta().hasDisplayName()
+																? aa.is.getItemMeta().getDisplayName()
+																: aa.is.getType().name()) + ".x."
+																+ aa.is.getAmount()));
 											}
 										}
 										Player ofowner = Bukkit.getPlayer(aa.owner);
@@ -796,6 +808,11 @@ public class Main extends JavaPlugin implements Listener {
 
 										aa.lastBid = e.getWhoClicked().getUniqueId();
 										econ.withdrawPlayer(((Player) e.getWhoClicked()), aa.buyitnow);
+										e.getWhoClicked().sendMessage(
+												prefix + s_youBought.replace("%amount%", "" + aa.buyitnow).replace("%item%",
+														(aa.is.getItemMeta().hasDisplayName()
+																? aa.is.getItemMeta().getDisplayName()
+																: aa.is.getType().name()) + ".x." + aa.is.getAmount()));
 										win(aa, true);
 										auctions.remove(aa);
 									}
@@ -813,7 +830,11 @@ public class Main extends JavaPlugin implements Listener {
 									OfflinePlayer ofp = Bukkit.getOfflinePlayer(aa.lastBid);
 									econ.depositPlayer(ofp, aa.currentPrice);
 									if (ofp.isOnline()) {
-										((Player) ofp).sendMessage(prefix + s_outBid);
+										((Player) ofp).sendMessage(prefix + s_outBid.replace("%item%",
+												(aa.is.getItemMeta().hasDisplayName()
+														? aa.is.getItemMeta().getDisplayName()
+														: aa.is.getType().name()) + ".x."
+														+ aa.is.getAmount()));
 									}
 								}
 
@@ -831,7 +852,7 @@ public class Main extends JavaPlugin implements Listener {
 								aa.lastBid = e.getWhoClicked().getUniqueId();
 								econ.withdrawPlayer(((Player) e.getWhoClicked()), aa.currentPrice);
 								e.getWhoClicked().sendMessage(
-										prefix + s_youBid.replace("%amount%", "" + aa.buyitnow).replace("%item%",
+										prefix + s_youBid.replace("%amount%", "" + aa.currentPrice).replace("%bid%", "" + aa.biddingPrice).replace("%item%",
 												(aa.is.getItemMeta().hasDisplayName()
 														? aa.is.getItemMeta().getDisplayName()
 														: aa.is.getType().name()) + ".x." + aa.is.getAmount()));

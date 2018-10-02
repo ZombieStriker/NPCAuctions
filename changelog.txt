@@ -1,3 +1,8 @@
+1.0.49
+	Fixed gramatical error for buying auction.
+	Rewrote some messages
+	Added new message for when buy-it-now is used.
+
 1.0.48
 	Added fix for 1.13 Auction houses NPCs.
 	Added ability to customize buttons.
