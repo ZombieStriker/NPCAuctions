@@ -45,13 +45,14 @@ public class ConfigHandler {
 				"CancelAuctionInvTitle"), AddAuctionInv("AddNewAuctionInvTitle"), CancelGen(
 				"CancelAuctionGeneralMessage"),CancelAuctionInvalid(
 				"CancelAuctionInvalidInput"), CancelAuctionExisting(
-				"CancelExistingAuctionBecauseItsUnfinished"), CancelOwn(
+				"CancelExistingAuctionBecauseItsUnfinished"), 
+		PREFIX("Prefix"),CancelOwn(
 				"CancelBidBecauseItsThePlayers"), AddAuc(
-				"SuccessfullyAddedAuction"), WonAuction("BidderWonAuction"), WonAucEarn(
+				"SuccessfullyAddedAuction"), WonAuction("BidderWonAuction"), CollectAuction("BidderMustCollectAuction"), WonAucEarn(
 				"AuctionEndedSold"), NoBids("AuctionEndedNoBids"), BidIncrease(
 				"InitialIncreaseBidding"), BiddingStart("InitialStarttingBid"), BiddingDur(
 				"InitialBiddingDurration"), BiddingBuy("InitialBuyItNow"), VillagersName(
-				"NPCName"), ItemNext("Item_NextPage"), youbought("youBought"), youbid("youBid"),refundCanceled("refundCanceledAuction"), someonebid("someoneBid"),someonebought("someoneBought"),ItemPrev(
+				"NPCName"), ItemNext("Item_NextPage"), ITEMCollect("Item_CollectAuctions"),youbought("youBought"), youbid("youBid"),refundCanceled("refundCanceledAuction"), someonebid("someoneBid"),someonebought("someoneBought"),ItemPrev(
 				"Item_PrevPage"), ItemAdd("Item_AddItemToAuctionHouse"), ItemCancel(
 				"Item_CancelExisitngAuction"), IncreaseMin("Min-Increase"),IncreaseMax("Max-Increase"),LoreTime(
 				"ItemLore_Time_Remaining"), LoreBuyItNow("ItemLore_Buy_it_Now"), loreBuyItNowHow(

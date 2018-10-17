@@ -13,6 +13,9 @@ public class QuickMaterialConversionClass {
 			return new ItemStack(Material.matchMaterial("STAINED_GLASS_PANE"),1,DyeColor.GRAY.getWoolData());
 		return new ItemStack(m);
 	}
+	public static ItemStack getGoldBlock() {
+		return new ItemStack(Material.GOLD_BLOCK);
+	}
 	@SuppressWarnings("deprecation")
 	public static ItemStack getRedWool() {
 		Material m =null;

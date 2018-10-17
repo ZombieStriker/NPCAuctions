@@ -52,6 +52,13 @@ public class NPCAuctionCommand implements CommandExecutor, TabExecutor {
 			if (sender instanceof Player)
 				((Player) sender).openInventory(Main.gui[0]);
 
+		} else if (args[0].equalsIgnoreCase("endAllAuctions")) {
+			
+			for(Auction a : Main.instance.auctions) {
+				a.setWait(0);
+			}
+			sender.sendMessage(Main.prefix + " Ending all auctions");
+			
 		} else if (args[0].equalsIgnoreCase("respawn")) {
 			for (Entry<UUID, Location> k : Main.tpbackto.entrySet()) {
 				for (Entity e : k.getValue().getWorld().getEntities()) {
@@ -134,6 +141,7 @@ public class NPCAuctionCommand implements CommandExecutor, TabExecutor {
 		s.sendMessage("/npca removenpc : Allows the user to remove villagers");
 		s.sendMessage("/npca respawn: In case villagers despawn, use this to readd them");
 		s.sendMessage("/npca open: Opens the auction house.");
+		s.sendMessage("/npca endAllAuctions: Ends all auctions.");
 	}
 
 	@Override
@@ -146,6 +154,7 @@ public class NPCAuctionCommand implements CommandExecutor, TabExecutor {
 			k.add("removenpc");
 			k.add("respawn");
 			k.add("open");
+			k.add("endAllAuctions");
 			return k;
 		}
 		return null;

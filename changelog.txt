@@ -1,3 +1,15 @@
+1.0.52
+	The Prefix is now configurable in the messages.yml.
+	Added ability to blacklist worlds.
+	Added system where players would need to collect items from the auction house to redeem them if they are in blacklisted worlds.
+
+1.0.51
+	Fixed issue where non-custom items could not be auctioned.
+
+1.0.50
+	Added /npca endAllAuctions. Use this command before updating to 1.13 in case items become invalid
+	Added fix for invalid items.
+
 1.0.49
 	Fixed gramatical error for buying auction.
 	Rewrote some messages
