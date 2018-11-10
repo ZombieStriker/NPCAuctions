@@ -48,7 +48,7 @@ public class ConfigHandler {
 				"CancelExistingAuctionBecauseItsUnfinished"), 
 		PREFIX("Prefix"),CancelOwn(
 				"CancelBidBecauseItsThePlayers"), AddAuc(
-				"SuccessfullyAddedAuction"), WonAuction("BidderWonAuction"), CollectAuction("BidderMustCollectAuction"), WonAucEarn(
+				"SuccessfullyAddedAuction"), PAGE_SUFFIX("MENU_Page_Suffix"),WonAuction("BidderWonAuction"), CollectAuction("BidderMustCollectAuction"), WonAucEarn(
 				"AuctionEndedSold"), NoBids("AuctionEndedNoBids"), BidIncrease(
 				"InitialIncreaseBidding"), BiddingStart("InitialStarttingBid"), BiddingDur(
 				"InitialBiddingDurration"), BiddingBuy("InitialBuyItNow"), VillagersName(
@@ -56,11 +56,11 @@ public class ConfigHandler {
 				"Item_PrevPage"), ItemAdd("Item_AddItemToAuctionHouse"), ItemCancel(
 				"Item_CancelExisitngAuction"), IncreaseMin("Min-Increase"),IncreaseMax("Max-Increase"),LoreTime(
 				"ItemLore_Time_Remaining"), LoreBuyItNow("ItemLore_Buy_it_Now"), loreBuyItNowHow(
-				"ItemLore_Buy_Ity_Now_Message"), LoreOwner(
+				"ItemLore_Buy_Ity_Now_Message"), LorePrice("ItemLore_Price"),LoreOwner(
 				"ItemLore_Created_By"), CAnnotBidOwnAuction(
 				"CancelCannotBidOwnAuction"), BuyIUtNowNo(
 				"Buy_It_Now_Optional_Say_No"), BuyItNowSetTo(
-				"Buy_It_Now_Price_Set"),rejoin_items("PlayerRejoinRecievesItems"), rejoin_amount("PlayerRejoinRecievesMoney"),Blacklisted("BlacklistedMaterial"),MAX_HOURS(
+				"Buy_It_Now_Price_Set"),CLAIM_items("PlayerClaimItems"),rejoin_items("PlayerRejoinRecievesItems"), rejoin_amount("PlayerRejoinRecievesMoney"),Blacklisted("BlacklistedMaterial"),MAX_HOURS(
 						"MaximumHoursForBids"),CANNOTBIDALRADYBID("AlreadyPlacedBid"),HIGHESTBIDDER("HighestBidder"),OutBid(
 						"OutBid"),broadcastAuction("BroacastAuctionOnSubmit"),broadcastAuctionMesssage("BroacastAuctionOnSubmitMessage"),limitAuctions("EnableAuctionLimitPerPlayer"),overlimit("AuctionLimitReached");
 		public String s;

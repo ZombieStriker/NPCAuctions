@@ -48,17 +48,18 @@ public class NPCAuctionCommand implements CommandExecutor, TabExecutor {
 				sender.sendMessage(Main.prefix + ChatColor.RED + Main.s_NOPERM);
 			}
 		} else if (args[0].equalsIgnoreCase("open")) {
-			if(sender.hasPermission("npcauctions.openGUIFromCommand"))
-			if (sender instanceof Player)
-				((Player) sender).openInventory(Main.gui[0]);
+			if (sender.hasPermission("npcauctions.openGUIFromCommand"))
+				if (sender instanceof Player)
+					((Player) sender).openInventory(Main.gui[0]);
 
 		} else if (args[0].equalsIgnoreCase("endAllAuctions")) {
-			
-			for(Auction a : Main.instance.auctions) {
+			if (!sender.hasPermission("npcauctions.endall"))
+				return false;
+			for (Auction a : Main.instance.auctions) {
 				a.setWait(0);
 			}
 			sender.sendMessage(Main.prefix + " Ending all auctions");
-			
+
 		} else if (args[0].equalsIgnoreCase("respawn")) {
 			for (Entry<UUID, Location> k : Main.tpbackto.entrySet()) {
 				for (Entity e : k.getValue().getWorld().getEntities()) {

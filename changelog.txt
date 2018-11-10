@@ -1,3 +1,22 @@
+1.0.54
+	Made "page: " suffix configurable
+	Made "Price" item lore tag configurable
+	Removed coolectAuctions button if there are no blacklisted worlds
+
+1.0.53
+	Fixed naming of items for broadcasting
+
+1.0.52D
+	Fixed perm for npc endall
+
+1.0.52C
+	Added different messages for if a player claimed an item, instead of joining.
+	Rewrote joining messages
+
+1.0.52B
+	Made config reload on disable. Should allow server owners to add blacklist even if server is online, as long as no auctions end at that moment
+	Fixed NPE on no one buying auction.
+
 1.0.52
 	The Prefix is now configurable in the messages.yml.
 	Added ability to blacklist worlds.
