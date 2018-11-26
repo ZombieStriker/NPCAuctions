@@ -76,6 +76,8 @@ public class Main extends JavaPlugin implements Listener {
 	public static String s_buyitnowoptional = "If NOT, type in \"No\" ";
 	public static String s_buyitnowset = " Set the Buy-It_now to $%price%";
 	public static String s_blacklistedmaterial = "&c %material% is not allowed to be auctioned!";
+	
+	public static String auctionhouseSkin = null;
 
 	public static String s_lorePrice = "Price : [$%price%+%bid%]";
 
@@ -173,6 +175,14 @@ public class Main extends JavaPlugin implements Listener {
 				}
 			}
 		}.runTaskLater(this, 20);
+		
+		if (getConfig().contains("NPCSkin_Username")) {
+			auctionhouseSkin = getConfig().getString("NPCSkin_Username");
+		} else {
+			getConfig().set("NPCSkin_Username", "null");
+			saveConfig();
+		}
+		
 		if (getConfig().contains("UseVillager")) {
 			USE_VILLAGERS = getConfig().getBoolean("UseVillager");
 		} else {

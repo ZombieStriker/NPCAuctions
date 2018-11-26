@@ -16,6 +16,8 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import net.citizensnpcs.npc.skin.SkinnableEntity;
+
 public class NPCAuctionCommand implements CommandExecutor, TabExecutor {
 	private Main m;
 
@@ -39,6 +41,10 @@ public class NPCAuctionCommand implements CommandExecutor, TabExecutor {
 							net.citizensnpcs.api.npc.NPC npc = net.citizensnpcs.api.CitizensAPI.getNPCRegistry()
 									.createNPC(EntityType.PLAYER, Main.s_VillagerName);
 							npc.spawn(((Player) sender).getLocation().add(0.1, 0.1, 0.1));
+							if (Main.auctionhouseSkin != null && !(Main.auctionhouseSkin.equalsIgnoreCase("null"))) {
+								SkinnableEntity se = ((SkinnableEntity) npc.getEntity());
+								se.setSkinName(Main.auctionhouseSkin);
+							}
 						}
 
 					}

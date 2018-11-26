@@ -1,3 +1,6 @@
+1.0.55
+	Added ability to customize npc skin
+
 1.0.54
 	Made "page: " suffix configurable
 	Made "Price" item lore tag configurable
