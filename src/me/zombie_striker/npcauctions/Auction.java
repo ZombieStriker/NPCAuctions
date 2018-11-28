@@ -10,27 +10,32 @@ public class Auction {
 	public UUID owner;
 	public String ownerName;
 	public boolean ownerOnline = true;
-	public int quarterSecondsLeft;
+	public int ticksLeft;
 	public double buyitnow = -1;
 	public UUID lastBid;
 	public double currentPrice;
-	public int auctionID = -1;
 	public double biddingPrice = 10;
 
-	public Auction(ItemStack is, UUID owner, String ownername, int id) {
+	public UUID auctionID = null;
+
+	public Auction(ItemStack is, UUID owner, String ownername) {
+		this(is, owner, ownername, UUID.randomUUID());
+	}
+
+	public Auction(ItemStack is, UUID owner, String ownername, UUID internalId) {
 		this.is = is;
 		this.owner = owner;
-		this.auctionID = id;
+		this.auctionID = internalId;
 		this.ownerName = ownername;
 	}
 
 	public boolean tickAuc() {
-		quarterSecondsLeft--;
-		return quarterSecondsLeft <= 0;
+		ticksLeft -= (Main.refreshRate * 20);
+		return ticksLeft <= 0;
 	}
 
 	public void setWait(int ticks) {
-		this.quarterSecondsLeft = ticks;
+		this.ticksLeft = ticks;
 	}
 
 	public boolean hasBuyItNow() {

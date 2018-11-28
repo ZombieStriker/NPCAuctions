@@ -1,3 +1,7 @@
+1.0.56
+	Added ability to customize refreshrate for auction houses.
+	Added reload command
+
 1.0.55
 	Added ability to customize npc skin
 

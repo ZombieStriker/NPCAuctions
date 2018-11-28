@@ -76,7 +76,7 @@ public class Main extends JavaPlugin implements Listener {
 	public static String s_buyitnowoptional = "If NOT, type in \"No\" ";
 	public static String s_buyitnowset = " Set the Buy-It_now to $%price%";
 	public static String s_blacklistedmaterial = "&c %material% is not allowed to be auctioned!";
-	
+
 	public static String auctionhouseSkin = null;
 
 	public static String s_lorePrice = "Price : [$%price%+%bid%]";
@@ -84,6 +84,8 @@ public class Main extends JavaPlugin implements Listener {
 	public static boolean enableViewLastBid = false;
 	public static double increaseMin = 1.0;
 	public static double increaseMax = 1000.0;
+
+	public static double refreshRate = 1.0;
 
 	public static int s_MAX_BID_TIME = 24;
 
@@ -123,8 +125,6 @@ public class Main extends JavaPlugin implements Listener {
 
 	public static Main instance;
 
-	public static final int TICK_SPEED = 5;
-
 	private boolean setupEconomy() {
 		if (getServer().getPluginManager().getPlugin("Vault") == null) {
 			return false;
@@ -145,7 +145,7 @@ public class Main extends JavaPlugin implements Listener {
 		if (a.lastBid != null)
 			getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID + "." + "lastbidder",
 					a.lastBid.toString());
-		getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID + "." + "timeleft", a.quarterSecondsLeft);
+		getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID + "." + "timeleftInTicks", a.ticksLeft);
 		getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID + "." + "item", a.is);
 	}
 
@@ -158,31 +158,22 @@ public class Main extends JavaPlugin implements Listener {
 		saveConfig();
 	}
 
-	@Override
-	public void onEnable() {
-		final Main m = this;
-		instance = m;
-		new BukkitRunnable() {
+	public void reloadVals() {
 
-			@Override
-			public void run() {
-				if (!setupEconomy()) {
-					getLogger().severe("- Disabled due to no Vault or no economy being found!");
-					getServer().getPluginManager().disablePlugin(m);
-					Bukkit.broadcastMessage(prefix
-							+ "Shutting down due to missng Vault dependancy (OR YOU ARE MISSING A PLUGIN THAT ADDS THE ECONOMY, NOT VAULT)");
-					return;
-				}
-			}
-		}.runTaskLater(this, 20);
-		
+		if (getConfig().contains("Auction-RefreshRate-inSeconds")) {
+			refreshRate = getConfig().getDouble("Auction-RefreshRate-inSeconds");
+		} else {
+			getConfig().set("Auction-RefreshRate-inSeconds", refreshRate);
+			saveConfig();
+		}
+
 		if (getConfig().contains("NPCSkin_Username")) {
 			auctionhouseSkin = getConfig().getString("NPCSkin_Username");
 		} else {
 			getConfig().set("NPCSkin_Username", "null");
 			saveConfig();
 		}
-		
+
 		if (getConfig().contains("UseVillager")) {
 			USE_VILLAGERS = getConfig().getBoolean("UseVillager");
 		} else {
@@ -285,19 +276,6 @@ public class Main extends JavaPlugin implements Listener {
 			e.printStackTrace();
 		}
 
-		try {
-			Bukkit.getPluginManager().registerEvents(new VillagerAuction(), this);
-		} catch (Error | Exception e) {
-		}
-
-		try {
-			NPCAuctionCommand npcc = new NPCAuctionCommand(this);
-			getCommand("NPCAuction").setExecutor(npcc);
-			getCommand("NPCAuction").setTabCompleter(npcc);
-		} catch (Error | Exception e) {
-			e.printStackTrace();
-		}
-
 		bufferstack = this.getConfigItemStack("NoItemSlot", QuickMaterialConversionClass.getGrayStained());
 		ItemMeta im = bufferstack.getItemMeta();
 		im.setDisplayName(" ");
@@ -326,40 +304,6 @@ public class Main extends JavaPlugin implements Listener {
 		im6.setDisplayName(s_ItemCollect);
 		collectAuc.setItemMeta(im6);
 
-		for (int i = 0; i < 20; i++) {
-			gui[i] = Bukkit.createInventory(null, 54, s_Title + s_Menu_page + (i + 1));
-		}
-		if (getConfig().contains("Auctions"))
-			for (String owners : getConfig().getConfigurationSection("Auctions").getKeys(false)) {
-				for (String ids : getConfig().getConfigurationSection("Auctions." + owners).getKeys(false)) {
-					UUID uuid = UUID.fromString(owners);
-					Auction a = new Auction(
-							(ItemStack) getConfig().get("Auctions." + owners + "." + ids + "." + "item"), uuid,
-							Bukkit.getOfflinePlayer(uuid).getName(), Integer.parseInt(ids));
-
-					if (!Bukkit.getOfflinePlayer(uuid).isOnline())
-						a.ownerOnline = false;
-
-					a.currentPrice = getConfig().getDouble("Auctions." + owners + "." + ids + "." + "price");
-					a.buyitnow = getConfig().getDouble("Auctions." + owners + "." + ids + "." + "buyitnow");
-					a.biddingPrice = getConfig().getDouble("Auctions." + owners + "." + ids + "." + "increase");
-					if (getConfig().contains("Auctions." + owners + "." + ids + "." + "lastbidder"))
-						a.lastBid = UUID.fromString(
-								getConfig().getString("Auctions." + owners + "." + ids + "." + "lastbidder"));
-					a.quarterSecondsLeft = getConfig().getInt("Auctions." + owners + "." + ids + "." + "timeleft");
-					auctions.add(a);
-				}
-			}
-		// getConfig().set("Auctions", null);
-
-		if (getConfig().contains("NPCS"))
-			for (String npcuuids : getConfig().getConfigurationSection("NPCS").getKeys(false)) {
-				try {
-					tpbackto.put(UUID.fromString(npcuuids), (Location) getConfig().get("NPCS." + npcuuids));
-				} catch (Error | Exception e34) {
-				}
-			}
-
 		if (!getConfig().contains("BlackListedWorlds")) {
 			getConfig().set("BlackListedWorlds", blacklistWorlds);
 			saveConfig();
@@ -373,6 +317,7 @@ public class Main extends JavaPlugin implements Listener {
 		if (!getConfig().contains("EnableViewLastBidder")) {
 			getConfig().set("EnableViewLastBidder", false);
 			enableViewLastBid = false;
+			saveConfig();
 		} else {
 			enableViewLastBid = getConfig().getBoolean("EnableViewLastBidder");
 		}
@@ -380,6 +325,7 @@ public class Main extends JavaPlugin implements Listener {
 			List<String> k = new ArrayList<String>();
 			k.add("BEDROCK");
 			getConfig().set("Blacklist", k);
+			saveConfig();
 		} else {
 			for (String blacklist : getConfig().getStringList("Blacklist")) {
 				try {
@@ -400,7 +346,80 @@ public class Main extends JavaPlugin implements Listener {
 				}
 			}
 		}
-		saveConfig();
+	}
+
+	@Override
+	public void onEnable() {
+		final Main m = this;
+		instance = m;
+		new BukkitRunnable() {
+
+			@Override
+			public void run() {
+				if (!setupEconomy()) {
+					getLogger().severe("- Disabled due to no Vault or no economy being found!");
+					getServer().getPluginManager().disablePlugin(m);
+					Bukkit.broadcastMessage(prefix
+							+ "Shutting down due to missng Vault dependancy (OR YOU ARE MISSING A PLUGIN THAT ADDS THE ECONOMY, NOT VAULT)");
+					return;
+				}
+			}
+		}.runTaskLater(this, 20);
+
+		reloadVals();
+		try {
+			Bukkit.getPluginManager().registerEvents(new VillagerAuction(), this);
+		} catch (Error | Exception e) {
+		}
+		try {
+			NPCAuctionCommand npcc = new NPCAuctionCommand(this);
+			getCommand("NPCAuction").setExecutor(npcc);
+			getCommand("NPCAuction").setTabCompleter(npcc);
+		} catch (Error | Exception e) {
+			e.printStackTrace();
+		}
+
+		for (int i = 0; i < 20; i++) {
+			gui[i] = Bukkit.createInventory(null, 54, s_Title + s_Menu_page + (i + 1));
+		}
+		if (getConfig().contains("Auctions"))
+			for (String owners : getConfig().getConfigurationSection("Auctions").getKeys(false)) {
+				for (String ids : getConfig().getConfigurationSection("Auctions." + owners).getKeys(false)) {
+					UUID auctionUUID = null;
+					try {
+						auctionUUID = UUID.fromString(ids);
+					} catch (Error | Exception e5) {
+						auctionUUID = UUID.randomUUID();
+					}
+					UUID uuid = UUID.fromString(owners);
+					Auction a = new Auction(
+							(ItemStack) getConfig().get("Auctions." + owners + "." + ids + "." + "item"), uuid,
+							Bukkit.getOfflinePlayer(uuid).getName(), auctionUUID);
+
+					if (!Bukkit.getOfflinePlayer(uuid).isOnline())
+						a.ownerOnline = false;
+
+					a.currentPrice = getConfig().getDouble("Auctions." + owners + "." + ids + "." + "price");
+					a.buyitnow = getConfig().getDouble("Auctions." + owners + "." + ids + "." + "buyitnow");
+					a.biddingPrice = getConfig().getDouble("Auctions." + owners + "." + ids + "." + "increase");
+					if (getConfig().contains("Auctions." + owners + "." + ids + "." + "lastbidder"))
+						a.lastBid = UUID.fromString(
+								getConfig().getString("Auctions." + owners + "." + ids + "." + "lastbidder"));
+					a.ticksLeft = getConfig().contains("Auctions." + owners + "." + ids + "." + "timeleft")
+							? getConfig().getInt("Auctions." + owners + "." + ids + "." + "timeleft") * 5
+							: getConfig().getInt("Auctions." + owners + "." + ids + "." + "timeleftInTicks");
+					auctions.add(a);
+				}
+			}
+		// getConfig().set("Auctions", null);
+
+		if (getConfig().contains("NPCS"))
+			for (String npcuuids : getConfig().getConfigurationSection("NPCS").getKeys(false)) {
+				try {
+					tpbackto.put(UUID.fromString(npcuuids), (Location) getConfig().get("NPCS." + npcuuids));
+				} catch (Error | Exception e34) {
+				}
+			}
 
 		Bukkit.getPluginManager().registerEvents(this, this);
 		new BukkitRunnable() {
@@ -422,10 +441,13 @@ public class Main extends JavaPlugin implements Listener {
 					}
 					ending.clear();
 				}
-				for (int i = 0; i < 20; i++)
-					updatePage(gui[i], i, i < Math.min(20, (auctions.size() / 36)), i > 0);
+
+				for (int i = 0; i < 20; i++) {
+					if (gui[i].getViewers().size() > 0)
+						updatePage(gui[i], i, i < Math.min(20, (auctions.size() / 36)), i > 0);
+				}
 			}
-		}.runTaskTimer(this, 1, 4);
+		}.runTaskTimer(this, 1, (long) (refreshRate * 20));
 
 		// Download the API dependancy
 		if (Bukkit.getPluginManager().getPlugin("PluginConstructorAPI") == null)
@@ -680,9 +702,9 @@ public class Main extends JavaPlugin implements Listener {
 						hours = -hours;
 					if (seconds < 0)
 						seconds = -seconds;
-					int ticks = ((((hours * 60) + minutes) * 60) + seconds) * 5;
-					if (ticks > s_MAX_BID_TIME * 60 * 60 * 5)
-						ticks = s_MAX_BID_TIME * 60 * 60 * 5;
+					int ticks = ((((hours * 60) + minutes) * 60) + seconds) * 20;
+					if (ticks > s_MAX_BID_TIME * 60 * 60 * 20)
+						ticks = s_MAX_BID_TIME * 60 * 60 * 20;
 
 					auctionWaitingMap.get(e.getPlayer().getUniqueId()).setWait(ticks);
 
@@ -870,7 +892,7 @@ public class Main extends JavaPlugin implements Listener {
 						aak = e.getInventory().getItem(e.getSlot());
 					}
 					if (aak != null) {
-						int k = Integer.parseInt(ChatColor.stripColor(aak.getItemMeta().getLore().get(0)));
+						UUID k = UUID.fromString(ChatColor.stripColor(aak.getItemMeta().getLore().get(0)));
 						Auction aa = null;
 						for (Auction a : auctions) {
 							if (a.auctionID == k) {
@@ -989,7 +1011,7 @@ public class Main extends JavaPlugin implements Listener {
 					aak = e.getInventory().getItem(e.getSlot());
 				}
 				if (aak != null) {
-					int k = Integer.parseInt(ChatColor.stripColor(aak.getItemMeta().getLore().get(0)));
+					UUID k = UUID.fromString(ChatColor.stripColor(aak.getItemMeta().getLore().get(0)));
 					Auction aa = null;
 					for (Auction a : auctions) {
 						if (a.auctionID == k) {
@@ -1049,8 +1071,7 @@ public class Main extends JavaPlugin implements Listener {
 					}
 				}
 
-				Auction a = new Auction(slotis, e.getWhoClicked().getUniqueId(), e.getWhoClicked().getName(),
-						(int) (Math.random() * 99999));
+				Auction a = new Auction(slotis, e.getWhoClicked().getUniqueId(), e.getWhoClicked().getName());
 				e.getWhoClicked().getInventory().setItem(e.getWhoClicked().getInventory().first(slotis), null);
 
 				if (auctionWaitingMap.containsKey(e.getWhoClicked().getUniqueId())) {
@@ -1078,7 +1099,7 @@ public class Main extends JavaPlugin implements Listener {
 			return new ItemStack(Material.AIR);
 		}
 
-		double time = (((double) a.quarterSecondsLeft) / TICK_SPEED);
+		double time = (((double) a.ticksLeft) / 20);
 		DecimalFormat df = new DecimalFormat("0.0");
 
 		List<String> lore = new ArrayList<>();
@@ -1103,7 +1124,7 @@ public class Main extends JavaPlugin implements Listener {
 			time2 = df.format(time % 60) + "s";
 		}
 
-		lore.add((a.quarterSecondsLeft / TICK_SPEED < 60 ? ChatColor.RED : ChatColor.GOLD) + s_loretime + time2);
+		lore.add(((a.ticksLeft / 20) < 60 ? ChatColor.RED : ChatColor.GOLD) + s_loretime + time2);
 		lore.add((a.ownerOnline ? ChatColor.GREEN : ChatColor.RED) + s_loreowner + a.ownerName);
 		if (enableViewLastBid)
 			if (a.lastBid != null)

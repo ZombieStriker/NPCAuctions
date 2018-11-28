@@ -53,6 +53,14 @@ public class NPCAuctionCommand implements CommandExecutor, TabExecutor {
 			} else {
 				sender.sendMessage(Main.prefix + ChatColor.RED + Main.s_NOPERM);
 			}
+		} else if (args[0].equalsIgnoreCase("reload")) {
+			if (sender.hasPermission("npcauctions.reload")) {
+				m.reloadConfig();
+				m.reloadVals();
+				sender.sendMessage("Reloaded config values");
+			} else {
+				sender.sendMessage(ChatColor.RED + " You are not allowed to use this command.");
+			}
 		} else if (args[0].equalsIgnoreCase("open")) {
 			if (sender.hasPermission("npcauctions.openGUIFromCommand"))
 				if (sender instanceof Player)
@@ -149,19 +157,26 @@ public class NPCAuctionCommand implements CommandExecutor, TabExecutor {
 		s.sendMessage("/npca respawn: In case villagers despawn, use this to readd them");
 		s.sendMessage("/npca open: Opens the auction house.");
 		s.sendMessage("/npca endAllAuctions: Ends all auctions.");
+		s.sendMessage("/npca reload: Reload config values (does not affect auctions).");
+	}
+
+	public void a(List<String> k, String test, String arg) {
+		if (test.toLowerCase().startsWith(arg.toLowerCase()))
+			k.add(test);
 	}
 
 	@Override
-	public List<String> onTabComplete(CommandSender arg0, Command arg1, String arg2, String[] arg3) {
-		if (arg3.length == 1) {
+	public List<String> onTabComplete(CommandSender arg0, Command arg1, String arg2, String[] args) {
+		if (args.length == 1) {
 			List<String> k = new ArrayList<String>();
-			k.add("spawnNPC");
-			k.add("removeallnpcs");
-			k.add("usevillagers");
-			k.add("removenpc");
-			k.add("respawn");
-			k.add("open");
-			k.add("endAllAuctions");
+			a(k, "spawnNPC", args[0]);
+			a(k, "removeallnpcs", args[0]);
+			a(k, "usevillagers", args[0]);
+			a(k, "removenpc", args[0]);
+			a(k, "respawn", args[0]);
+			a(k, "open", args[0]);
+			a(k, "reload", args[0]);
+			a(k, "endAllAuctions", args[0]);
 			return k;
 		}
 		return null;
