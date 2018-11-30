@@ -1,3 +1,9 @@
+1.0.57
+	Fixed more NPEs. Change storage system to use UUID instead of numbers, so there is no chance that two auctions will have the same ID.
+
+1.0.56b
+	Fixed possible NPE for null owners/auctions
+
 1.0.56
 	Added ability to customize refreshrate for auction houses.
 	Added reload command

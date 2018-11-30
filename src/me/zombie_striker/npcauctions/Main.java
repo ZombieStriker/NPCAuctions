@@ -85,7 +85,7 @@ public class Main extends JavaPlugin implements Listener {
 	public static double increaseMin = 1.0;
 	public static double increaseMax = 1000.0;
 
-	public static double refreshRate = 1.0;
+	public static double refreshRate = 0.5;
 
 	public static int s_MAX_BID_TIME = 24;
 
@@ -874,13 +874,17 @@ public class Main extends JavaPlugin implements Listener {
 			} else if (e.getSlot() == 52 && (slotcheck)) {
 				int k = (Integer.parseInt(e.getWhoClicked().getOpenInventory().getTitle().split(s_Menu_page)[1].trim())
 						- 1) - 1;
-				if (k >= 0)
+				if (k >= 0) {
+					updatePage(gui[k], k, k < Math.min(20, (auctions.size() / 36)), k > 0);					
 					e.getWhoClicked().openInventory(gui[k]);
+				}
 			} else if (e.getSlot() == 53 && (slotcheck) && (!buffercheck)) {
 				int k = (Integer.parseInt(e.getWhoClicked().getOpenInventory().getTitle().split(s_Menu_page)[1].trim())
 						- 1) + 1;
-				if (k < gui.length)
+				if (k < gui.length) {
+					updatePage(gui[k], k, k < Math.min(20, (auctions.size() / 36)), k > 0);
 					e.getWhoClicked().openInventory(gui[k]);
+				}
 
 			} else if (buffercheck) {
 			} else {
@@ -900,7 +904,14 @@ public class Main extends JavaPlugin implements Listener {
 								break;
 							}
 						}
-						if (aa.owner.equals(e.getWhoClicked().getUniqueId())) {
+						if(aa==null) {
+							e.setCancelled(true);
+							return;
+						}
+
+						if (aa.owner==null) {
+							e.getWhoClicked().sendMessage(prefix + "The owner of the auction is somehow null. Don't know how that can be.");
+						}else if (aa.owner.equals(e.getWhoClicked().getUniqueId())) {
 							e.getWhoClicked().sendMessage(prefix + s_cannotbidown);
 						} else if (aa.lastBid != null && aa.lastBid.equals(e.getWhoClicked().getUniqueId())) {
 							e.getWhoClicked().sendMessage(prefix + s_cancelAlreadyBid);
@@ -1019,7 +1030,13 @@ public class Main extends JavaPlugin implements Listener {
 							break;
 						}
 					}
-					if (aa.owner.equals(e.getWhoClicked().getUniqueId())) {
+					if(aa==null) {
+						e.setCancelled(true);
+						return;
+					}
+					if (aa.owner==null) {
+						e.getWhoClicked().sendMessage(prefix + "The owner of the auction is somehow null. Don't know how that can be.");
+					}else if (aa.owner.equals(e.getWhoClicked().getUniqueId())) {
 						e.getWhoClicked().closeInventory();
 						e.getWhoClicked().sendMessage(prefix + s_cancelGen);
 						e.getWhoClicked().getInventory().addItem(aa.is);
@@ -1061,7 +1078,6 @@ public class Main extends JavaPlugin implements Listener {
 				slotis = e.getView().getBottomInventory().getItem(e.getSlot());
 			}
 			if (itemnull) {
-
 				for (BlackListedItem bli : blacklist) {
 					if (bli.getMat() == slotis.getType()
 							&& (bli.getData() == -1 || bli.getData() == slotis.getDurability())) {
@@ -1103,7 +1119,7 @@ public class Main extends JavaPlugin implements Listener {
 		DecimalFormat df = new DecimalFormat("0.0");
 
 		List<String> lore = new ArrayList<>();
-		lore.add(ChatColor.BLACK + "" + a.auctionID);
+		lore.add(ChatColor.BLACK + "" + a.auctionID.toString());
 		lore.add(ChatColor.GREEN
 				+ s_lorePrice.replaceAll("%price%", a.currentPrice + "").replaceAll("%bid%", a.biddingPrice + ""));
 		// lore.add(ChatColor.GREEN + "Price : [$" + a.currentPrice + "+" +
