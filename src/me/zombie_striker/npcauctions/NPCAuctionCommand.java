@@ -5,15 +5,19 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import net.citizensnpcs.npc.skin.SkinnableEntity;
@@ -25,6 +29,7 @@ public class NPCAuctionCommand implements CommandExecutor, TabExecutor {
 		this.m = k;
 	}
 
+	@SuppressWarnings({ "deprecation", "unchecked" })
 	@Override
 	public boolean onCommand(final CommandSender sender, Command arg1, String commandname, String[] args) {
 		if (args.length == 0) {
@@ -66,6 +71,70 @@ public class NPCAuctionCommand implements CommandExecutor, TabExecutor {
 				if (sender instanceof Player)
 					((Player) sender).openInventory(Main.gui[0]);
 
+		} else if (args[0].equalsIgnoreCase("cancelAuction")) {
+			if (!sender.hasPermission("npcauctions.cancelauction"))
+				return false;
+			OfflinePlayer user = null;
+			if (args.length > 1) {
+				user = Bukkit.getOfflinePlayer(args[1]);
+			} else {
+				user = (Player) sender;
+			}
+			int endAuctions = 0;
+			for (Auction aa : Main.instance.auctions) {
+				if (aa.owner.equals(user.getUniqueId())) {
+					endAuctions++;
+
+					if (!user.isOnline()) {
+						List<ItemStack> items = (List<ItemStack>) m.getConfig()
+								.get(aa.lastBid.toString() + ".recievedItems");
+						if (items == null)
+							items = new ArrayList<ItemStack>();
+						items.add(aa.is);
+						m.getConfig().set(aa.lastBid.toString() + ".recievedItems", items);
+						m.saveConfig();
+					} else {
+						((HumanEntity) user).getInventory().addItem(aa.is);
+					}
+					if (aa.lastBid != null) {
+						Main.econ.depositPlayer(Bukkit.getOfflinePlayer(aa.lastBid), aa.currentPrice);
+						if (Bukkit.getPlayer(aa.lastBid) != null)
+							Bukkit.getPlayer(aa.lastBid)
+									.sendMessage(Main.prefix + Main.s_auctionCancelRefund
+											.replace("%amount%", "" + aa.currentPrice).replace("%item%",
+													(aa.is.getItemMeta().hasDisplayName()
+															? aa.is.getItemMeta().getDisplayName()
+															: aa.is.getType().name()) + ".x." + aa.is.getAmount()));
+					}
+					m.auctions.remove(aa);
+					m.getConfig().set("Auctions." + aa.owner.toString() + "." + aa.auctionID.toString(), null);
+					m.saveConfig();
+
+				}
+			}
+			sender.sendMessage(Main.prefix + " Ended " + endAuctions + " auctions for " + user.getName() + ".");
+
+			/**
+			 * 
+			 * 
+			 * if (!creator.isOnline()) { double i = (withBuyItNow ? a.buyitnow :
+			 * a.currentPrice); if (getConfig().contains(a.owner.toString() +
+			 * ".offlineAmount")) i += getConfig().getDouble(a.owner.toString() +
+			 * ".offlineAmount"); getConfig().set(a.owner.toString() + ".offlineAmount", i);
+			 * saveConfig(); }
+			 * 
+			 * 
+			 * 
+			 * e.getWhoClicked().getInventory().addItem(aa.is); if (aa.lastBid != null) {
+			 * econ.depositPlayer(Bukkit.getOfflinePlayer(aa.lastBid), aa.currentPrice); if
+			 * (Bukkit.getPlayer(aa.lastBid) != null) Bukkit.getPlayer(aa.lastBid)
+			 * .sendMessage(prefix + s_auctionCancelRefund .replace("%amount%", "" +
+			 * aa.currentPrice).replace("%item%", (aa.is.getItemMeta().hasDisplayName() ?
+			 * aa.is.getItemMeta().getDisplayName() : aa.is.getType().name()) + ".x." +
+			 * aa.is.getAmount())); } auctions.remove(aa); getConfig().set("Auctions." +
+			 * aa.owner.toString() + "." + aa.auctionID, null); saveConfig();
+			 */
+			sender.sendMessage(Main.prefix + " Ending all auctions");
 		} else if (args[0].equalsIgnoreCase("endAllAuctions")) {
 			if (!sender.hasPermission("npcauctions.endall"))
 				return false;
@@ -157,6 +226,7 @@ public class NPCAuctionCommand implements CommandExecutor, TabExecutor {
 		s.sendMessage("/npca respawn: In case villagers despawn, use this to readd them");
 		s.sendMessage("/npca open: Opens the auction house.");
 		s.sendMessage("/npca endAllAuctions: Ends all auctions.");
+		s.sendMessage("/npca cancelAuction: Ends all of a user's auctions.");
 		s.sendMessage("/npca reload: Reload config values (does not affect auctions).");
 	}
 
@@ -169,6 +239,7 @@ public class NPCAuctionCommand implements CommandExecutor, TabExecutor {
 	public List<String> onTabComplete(CommandSender arg0, Command arg1, String arg2, String[] args) {
 		if (args.length == 1) {
 			List<String> k = new ArrayList<String>();
+			a(k, "cancelAuction", args[0]);
 			a(k, "spawnNPC", args[0]);
 			a(k, "removeallnpcs", args[0]);
 			a(k, "usevillagers", args[0]);
@@ -178,6 +249,15 @@ public class NPCAuctionCommand implements CommandExecutor, TabExecutor {
 			a(k, "reload", args[0]);
 			a(k, "endAllAuctions", args[0]);
 			return k;
+		} else if (args.length == 2) {
+			if (args[0].equalsIgnoreCase("cancelAuction")) {
+				List<String> k = new ArrayList<String>();
+				for (Auction aa : m.auctions) {
+					if (!k.contains(Bukkit.getOfflinePlayer(aa.owner).getName()))
+						a(k, Bukkit.getOfflinePlayer(aa.owner).getName(), args[0]);
+				}
+				return k;
+			}
 		}
 		return null;
 	}

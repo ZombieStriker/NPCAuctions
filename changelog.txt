@@ -1,3 +1,13 @@
+1.0.58
+	Fixed issue where it was possible for a buyer to get the owner's items that they one for an auction.
+	Added /npca cancelAuction <player> to cancel another player's auctions.
+
+1.0.57c
+	Fixed error if the player somehow clicks an "air item", which should not exist in a menu. 
+
+1.0.57b
+	Fixed issue where auctions may not be detected.
+
 1.0.57
 	Fixed more NPEs. Change storage system to use UUID instead of numbers, so there is no chance that two auctions will have the same ID.
 

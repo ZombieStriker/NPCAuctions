@@ -1,5 +1,5 @@
 main: me.zombie_striker.npcauctions.Main
-version: 1.0.57
+version: 1.0.58
 name: NPCAuctions
 api-version: 1.13
 commands:
@@ -15,6 +15,7 @@ permissions:
       npcauctions.bypasslimit: true
       npcauctions.default: true
       npcauctions.endall: true
+      npcauctions.cancelauction: true
   npcauctions.auctionlimit.1:
     description: limits the auction to 1
   npcauctions.default:

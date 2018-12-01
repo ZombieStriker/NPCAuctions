@@ -139,14 +139,14 @@ public class Main extends JavaPlugin implements Listener {
 
 	public void saveAuctionNoSave(Auction a) {
 
-		getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID + "." + "price", a.currentPrice);
-		getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID + "." + "buyitnow", a.buyitnow);
-		getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID + "." + "increase", a.biddingPrice);
+		getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID .toString()+ "." + "price", a.currentPrice);
+		getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID.toString() + "." + "buyitnow", a.buyitnow);
+		getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID.toString() + "." + "increase", a.biddingPrice);
 		if (a.lastBid != null)
-			getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID + "." + "lastbidder",
+			getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID.toString() + "." + "lastbidder",
 					a.lastBid.toString());
-		getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID + "." + "timeleftInTicks", a.ticksLeft);
-		getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID + "." + "item", a.is);
+		getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID.toString() + "." + "timeleftInTicks", a.ticksLeft);
+		getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID.toString() + "." + "item", a.is);
 	}
 
 	@Override
@@ -435,7 +435,7 @@ public class Main extends JavaPlugin implements Listener {
 				}
 				if (ending.size() > 0) {
 					for (Auction a : ending) {
-						getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID, null);
+						getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID.toString(), null);
 						saveConfig();
 						auctions.remove(a);
 					}
@@ -516,7 +516,7 @@ public class Main extends JavaPlugin implements Listener {
 				getConfig().set(a.owner.toString() + ".offlineAmount", i);
 				saveConfig();
 			}
-			getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID, null);
+			getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID.toString(), null);
 			saveConfig();
 			if (lastbid.isOnline()) {
 				if (blacklistWorlds.contains(((Player) lastbid).getWorld().getName())) {
@@ -538,7 +538,7 @@ public class Main extends JavaPlugin implements Listener {
 					}
 				}
 			} else {
-				List<ItemStack> items = (List<ItemStack>) getConfig().get(a.owner.toString() + ".recievedItems");
+				List<ItemStack> items = (List<ItemStack>) getConfig().get(a.lastBid.toString() + ".recievedItems");
 				if (items == null)
 					items = new ArrayList<ItemStack>();
 				items.add(a.is);
@@ -896,10 +896,14 @@ public class Main extends JavaPlugin implements Listener {
 						aak = e.getInventory().getItem(e.getSlot());
 					}
 					if (aak != null) {
+						if(!aak.hasItemMeta() ||!aak.getItemMeta().hasLore()) {
+							e.setCancelled(true);
+							return;
+						}
 						UUID k = UUID.fromString(ChatColor.stripColor(aak.getItemMeta().getLore().get(0)));
 						Auction aa = null;
 						for (Auction a : auctions) {
-							if (a.auctionID == k) {
+							if (a.auctionID.equals(k)) {
 								aa = a;
 								break;
 							}
@@ -1017,15 +1021,19 @@ public class Main extends JavaPlugin implements Listener {
 			try {
 				ItemStack aak = null;
 				try {
-					aak = e.getClickedInventory().getItem(e.getSlot());
+					aak = e.getCurrentItem();//.getClickedInventory().getItem(e.getSlot());
 				} catch (Error | Exception e2) {
 					aak = e.getInventory().getItem(e.getSlot());
 				}
 				if (aak != null) {
+					if(!aak.hasItemMeta() ||!aak.getItemMeta().hasLore()) {
+						e.setCancelled(true);
+						return;
+					}
 					UUID k = UUID.fromString(ChatColor.stripColor(aak.getItemMeta().getLore().get(0)));
 					Auction aa = null;
 					for (Auction a : auctions) {
-						if (a.auctionID == k) {
+						if (a.auctionID.equals(k)) {
 							aa = a;
 							break;
 						}
@@ -1051,7 +1059,7 @@ public class Main extends JavaPlugin implements Listener {
 																: aa.is.getType().name()) + ".x." + aa.is.getAmount()));
 						}
 						auctions.remove(aa);
-						getConfig().set("Auctions." + aa.owner.toString() + "." + aa.auctionID, null);
+						getConfig().set("Auctions." + aa.owner.toString() + "." + aa.auctionID.toString(), null);
 						saveConfig();
 					}
 				}
