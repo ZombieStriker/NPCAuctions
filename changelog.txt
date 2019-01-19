@@ -1,3 +1,6 @@
+1.0.59
+	Added option in messages.yml
+
 1.0.58
 	Fixed issue where it was possible for a buyer to get the owner's items that they one for an auction.
 	Added /npca cancelAuction <player> to cancel another player's auctions.

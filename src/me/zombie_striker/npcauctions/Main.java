@@ -96,6 +96,7 @@ public class Main extends JavaPlugin implements Listener {
 	public static HashMap<UUID, Location> tpbackto = new HashMap<UUID, Location>();
 
 	public static boolean enableBroadcasting = false;
+	public static boolean messageOnBid = true;
 	public static String s_broadcastMessage = " %player% is auctioning %amount% %material% starting at %cost%";
 	public static boolean limitAmount = false;
 	public static String s_overlimit = " You cannot auction this many items at once! Wait till one of your other auctions is finished.";
@@ -232,7 +233,7 @@ public class Main extends JavaPlugin implements Listener {
 			s_rejoin_amount = c.getMessage(Keys.rejoin_amount, s_rejoin_amount);
 			s_rejoin_items = c.getMessage(Keys.rejoin_items, s_rejoin_items);
 			s_CLAIM_items = c.getMessage(Keys.CLAIM_items, s_CLAIM_items);
-
+			
 			prefix = c.getMessage(Keys.PREFIX, prefix);
 
 			s_ItemAdd = c.getMessage(Keys.ItemAdd, s_ItemAdd);
@@ -304,6 +305,10 @@ public class Main extends JavaPlugin implements Listener {
 		im6.setDisplayName(s_ItemCollect);
 		collectAuc.setItemMeta(im6);
 
+		if (!getConfig().contains("SendMessagesWhenSomeoneBid")) {
+			getConfig().set("SendMessagesWhenSomeoneBid", messageOnBid);
+			saveConfig();
+		}
 		if (!getConfig().contains("BlackListedWorlds")) {
 			getConfig().set("BlackListedWorlds", blacklistWorlds);
 			saveConfig();
@@ -939,6 +944,7 @@ public class Main extends JavaPlugin implements Listener {
 										}
 										Player ofowner = Bukkit.getPlayer(aa.owner);
 										if (ofowner != null) {
+											if(messageOnBid)
 											ofowner.sendMessage(prefix
 													+ s_someoneBought.replace("%player%", e.getWhoClicked().getName())
 															.replace("%amount%", "" + aa.buyitnow).replace("%item%",
@@ -984,6 +990,7 @@ public class Main extends JavaPlugin implements Listener {
 								Player ofowner = Bukkit.getPlayer(aa.owner);
 								aa.currentPrice += aa.biddingPrice;
 								if (ofowner != null) {
+									if(messageOnBid)
 									ofowner.sendMessage(prefix + s_someoneBid
 											.replace("%player%", e.getWhoClicked().getName())
 											.replace("%amount%", "" + aa.currentPrice)
