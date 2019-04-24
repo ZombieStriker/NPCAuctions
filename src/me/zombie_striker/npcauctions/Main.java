@@ -140,13 +140,16 @@ public class Main extends JavaPlugin implements Listener {
 
 	public void saveAuctionNoSave(Auction a) {
 
-		getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID .toString()+ "." + "price", a.currentPrice);
+		getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID.toString() + "." + "price",
+				a.currentPrice);
 		getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID.toString() + "." + "buyitnow", a.buyitnow);
-		getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID.toString() + "." + "increase", a.biddingPrice);
+		getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID.toString() + "." + "increase",
+				a.biddingPrice);
 		if (a.lastBid != null)
 			getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID.toString() + "." + "lastbidder",
 					a.lastBid.toString());
-		getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID.toString() + "." + "timeleftInTicks", a.ticksLeft);
+		getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID.toString() + "." + "timeleftInTicks",
+				a.ticksLeft);
 		getConfig().set("Auctions." + a.owner.toString() + "." + a.auctionID.toString() + "." + "item", a.is);
 	}
 
@@ -233,7 +236,7 @@ public class Main extends JavaPlugin implements Listener {
 			s_rejoin_amount = c.getMessage(Keys.rejoin_amount, s_rejoin_amount);
 			s_rejoin_items = c.getMessage(Keys.rejoin_items, s_rejoin_items);
 			s_CLAIM_items = c.getMessage(Keys.CLAIM_items, s_CLAIM_items);
-			
+
 			prefix = c.getMessage(Keys.PREFIX, prefix);
 
 			s_ItemAdd = c.getMessage(Keys.ItemAdd, s_ItemAdd);
@@ -880,7 +883,7 @@ public class Main extends JavaPlugin implements Listener {
 				int k = (Integer.parseInt(e.getWhoClicked().getOpenInventory().getTitle().split(s_Menu_page)[1].trim())
 						- 1) - 1;
 				if (k >= 0) {
-					updatePage(gui[k], k, k < Math.min(20, (auctions.size() / 36)), k > 0);					
+					updatePage(gui[k], k, k < Math.min(20, (auctions.size() / 36)), k > 0);
 					e.getWhoClicked().openInventory(gui[k]);
 				}
 			} else if (e.getSlot() == 53 && (slotcheck) && (!buffercheck)) {
@@ -901,7 +904,7 @@ public class Main extends JavaPlugin implements Listener {
 						aak = e.getInventory().getItem(e.getSlot());
 					}
 					if (aak != null) {
-						if(!aak.hasItemMeta() ||!aak.getItemMeta().hasLore()) {
+						if (!aak.hasItemMeta() || !aak.getItemMeta().hasLore()) {
 							e.setCancelled(true);
 							return;
 						}
@@ -913,17 +916,16 @@ public class Main extends JavaPlugin implements Listener {
 								break;
 							}
 						}
-						if(aa==null) {
+						if (aa == null) {
 							e.setCancelled(true);
 							return;
 						}
 
-						if (aa.owner==null) {
-							e.getWhoClicked().sendMessage(prefix + "The owner of the auction is somehow null. Don't know how that can be.");
-						}else if (aa.owner.equals(e.getWhoClicked().getUniqueId())) {
+						if (aa.owner == null) {
+							e.getWhoClicked().sendMessage(
+									prefix + "The owner of the auction is somehow null. Don't know how that can be.");
+						} else if (aa.owner.equals(e.getWhoClicked().getUniqueId())) {
 							e.getWhoClicked().sendMessage(prefix + s_cannotbidown);
-						} else if (aa.lastBid != null && aa.lastBid.equals(e.getWhoClicked().getUniqueId())) {
-							e.getWhoClicked().sendMessage(prefix + s_cancelAlreadyBid);
 						} else {
 							if (aa.hasBuyItNow()) {
 								if (e.isRightClick()) {
@@ -944,14 +946,14 @@ public class Main extends JavaPlugin implements Listener {
 										}
 										Player ofowner = Bukkit.getPlayer(aa.owner);
 										if (ofowner != null) {
-											if(messageOnBid)
-											ofowner.sendMessage(prefix
-													+ s_someoneBought.replace("%player%", e.getWhoClicked().getName())
-															.replace("%amount%", "" + aa.buyitnow).replace("%item%",
-																	(aa.is.getItemMeta().hasDisplayName()
-																			? aa.is.getItemMeta().getDisplayName()
-																			: aa.is.getType().name()) + ".x."
-																			+ aa.is.getAmount()));
+											if (messageOnBid)
+												ofowner.sendMessage(prefix + s_someoneBought
+														.replace("%player%", e.getWhoClicked().getName())
+														.replace("%amount%", "" + aa.buyitnow).replace("%item%",
+																(aa.is.getItemMeta().hasDisplayName()
+																		? aa.is.getItemMeta().getDisplayName()
+																		: aa.is.getType().name()) + ".x."
+																		+ aa.is.getAmount()));
 										}
 										// public static String s_someoneBid = "%player% has bid %amount% for your
 										// %item% auction";
@@ -968,6 +970,10 @@ public class Main extends JavaPlugin implements Listener {
 									}
 									return;
 								}
+							}
+							if (aa.lastBid != null && aa.lastBid.equals(e.getWhoClicked().getUniqueId())) {
+								e.getWhoClicked().sendMessage(prefix + s_cancelAlreadyBid);
+								return;
 							}
 							if (econ.getBalance((OfflinePlayer) e.getWhoClicked()) >= aa.currentPrice
 									+ aa.biddingPrice) {
@@ -990,14 +996,14 @@ public class Main extends JavaPlugin implements Listener {
 								Player ofowner = Bukkit.getPlayer(aa.owner);
 								aa.currentPrice += aa.biddingPrice;
 								if (ofowner != null) {
-									if(messageOnBid)
-									ofowner.sendMessage(prefix + s_someoneBid
-											.replace("%player%", e.getWhoClicked().getName())
-											.replace("%amount%", "" + aa.currentPrice)
-											.replace("%bid%", "" + aa.biddingPrice).replace("%item%",
-													(aa.is.getItemMeta().hasDisplayName()
-															? aa.is.getItemMeta().getDisplayName()
-															: aa.is.getType().name()) + ".x." + aa.is.getAmount()));
+									if (messageOnBid)
+										ofowner.sendMessage(prefix + s_someoneBid
+												.replace("%player%", e.getWhoClicked().getName())
+												.replace("%amount%", "" + aa.currentPrice)
+												.replace("%bid%", "" + aa.biddingPrice).replace("%item%",
+														(aa.is.getItemMeta().hasDisplayName()
+																? aa.is.getItemMeta().getDisplayName()
+																: aa.is.getType().name()) + ".x." + aa.is.getAmount()));
 								}
 								aa.lastBid = e.getWhoClicked().getUniqueId();
 								econ.withdrawPlayer(((Player) e.getWhoClicked()), aa.currentPrice);
@@ -1028,12 +1034,12 @@ public class Main extends JavaPlugin implements Listener {
 			try {
 				ItemStack aak = null;
 				try {
-					aak = e.getCurrentItem();//.getClickedInventory().getItem(e.getSlot());
+					aak = e.getCurrentItem();// .getClickedInventory().getItem(e.getSlot());
 				} catch (Error | Exception e2) {
 					aak = e.getInventory().getItem(e.getSlot());
 				}
 				if (aak != null) {
-					if(!aak.hasItemMeta() ||!aak.getItemMeta().hasLore()) {
+					if (!aak.hasItemMeta() || !aak.getItemMeta().hasLore()) {
 						e.setCancelled(true);
 						return;
 					}
@@ -1045,13 +1051,14 @@ public class Main extends JavaPlugin implements Listener {
 							break;
 						}
 					}
-					if(aa==null) {
+					if (aa == null) {
 						e.setCancelled(true);
 						return;
 					}
-					if (aa.owner==null) {
-						e.getWhoClicked().sendMessage(prefix + "The owner of the auction is somehow null. Don't know how that can be.");
-					}else if (aa.owner.equals(e.getWhoClicked().getUniqueId())) {
+					if (aa.owner == null) {
+						e.getWhoClicked().sendMessage(
+								prefix + "The owner of the auction is somehow null. Don't know how that can be.");
+					} else if (aa.owner.equals(e.getWhoClicked().getUniqueId())) {
 						e.getWhoClicked().closeInventory();
 						e.getWhoClicked().sendMessage(prefix + s_cancelGen);
 						e.getWhoClicked().getInventory().addItem(aa.is);

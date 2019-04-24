@@ -1,3 +1,6 @@
+1.0.60
+	Allows users to use buy it now after bidding.
+
 1.0.59
 	Added option in messages.yml
 
