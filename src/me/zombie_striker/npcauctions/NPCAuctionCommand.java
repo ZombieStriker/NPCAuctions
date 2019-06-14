@@ -1,6 +1,7 @@
 package me.zombie_striker.npcauctions;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.UUID;
@@ -144,7 +145,7 @@ public class NPCAuctionCommand implements CommandExecutor, TabExecutor {
 			sender.sendMessage(Main.prefix + " Ending all auctions");
 
 		} else if (args[0].equalsIgnoreCase("respawn")) {
-			for (Entry<UUID, Location> k : Main.tpbackto.entrySet()) {
+			for (Entry<UUID, Location> k : new HashSet<>(Main.tpbackto.entrySet())) {
 				for (Entity e : k.getValue().getWorld().getEntities()) {
 					if (e.getUniqueId().equals(k.getKey())) {
 						e.teleport(k.getValue());

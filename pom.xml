@@ -4,12 +4,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>me.zombie_striker</groupId>
 	<artifactId>NPCAuctions</artifactId>
-	<version>1.0.61</version>
+	<version>1.0.62</version>
 	<repositories>
 		<repository>
 			<id>spigot-repo</id>
-			<url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
+			<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
 		</repository>
+
 
 		<repository>
 			<id>citizens-repo</id>
@@ -25,11 +26,13 @@
 
 	<dependencies>
 
-		<!--Spigot API -->
+
+		<!--Spigot API-->
+		<!--You only need one of the two, don't put both. Spigot is recommended.-->
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot</artifactId>
-			<version>1.14.1-R0.1-SNAPSHOT</version>
+			<version>1.14.2-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 
