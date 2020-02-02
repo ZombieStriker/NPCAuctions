@@ -12,6 +12,19 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class VillagerAuction implements Listener {
 
+	public static Entity spawnVillager(Location loc) {
+		Villager v = (Villager) loc.getWorld().spawnEntity(loc, EntityType.VILLAGER);
+		v.setAdult();
+		v.setAI(false);
+		v.setSilent(true);
+		v.setCustomNameVisible(true);
+		v.setCustomName(Main.s_VillagerName);
+		Main.tpbackto.put(v.getUniqueId(), loc);
+		Main.instance.getConfig().set("NPCS." + v.getUniqueId().toString(), loc);
+		Main.instance.saveConfig();
+		return v;
+	}
+
 	@EventHandler
 	public void interact(final PlayerInteractAtEntityEvent e) {
 		if (e.getRightClicked() instanceof Villager) {
@@ -23,7 +36,6 @@ public class VillagerAuction implements Listener {
 							e.getPlayer().openInventory(Main.gui[0]);
 						}
 					}.runTaskLater(Main.instance, 1);
-					//e.getPlayer().openInventory(Main.gui[0]);
 					e.setCancelled(true);
 				}
 		}
@@ -38,7 +50,7 @@ public class VillagerAuction implements Listener {
 			if (e.getEntity().getCustomName().equalsIgnoreCase(Main.s_VillagerName)) {
 				e.setCancelled(true);
 				if (e.getCause() == DamageCause.FIRE_TICK || e.getCause() == DamageCause.FIRE) {
-					((LivingEntity) e.getEntity()).setFireTicks(0);
+					e.getEntity().setFireTicks(0);
 				}
 			}
 	}
@@ -65,21 +77,8 @@ public class VillagerAuction implements Listener {
 				} else {
 					Main.removeAuctions.remove(e.getDamager().getUniqueId());
 					if (e.getEntity() instanceof Villager)
-						((Player) e.getDamager()).sendMessage(Main.prefix + " Villager removal canceled");
+						e.getDamager().sendMessage(Main.prefix + " Villager removal canceled");
 				}
 			}
-	}
-
-	public static Entity spawnVillager(Location loc) {
-		Villager v = (Villager) loc.getWorld().spawnEntity(loc, EntityType.VILLAGER);
-		v.setAdult();
-		v.setAI(false);
-		v.setSilent(true);
-		v.setCustomNameVisible(true);
-		v.setCustomName(Main.s_VillagerName);
-		Main.tpbackto.put(v.getUniqueId(), loc);
-		Main.instance.getConfig().set("NPCS." + v.getUniqueId().toString(), loc);
-		Main.instance.saveConfig();
-		return v;
 	}
 }

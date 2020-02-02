@@ -115,26 +115,6 @@ public class NPCAuctionCommand implements CommandExecutor, TabExecutor {
 			}
 			sender.sendMessage(Main.prefix + " Ended " + endAuctions + " auctions for " + user.getName() + ".");
 
-			/**
-			 * 
-			 * 
-			 * if (!creator.isOnline()) { double i = (withBuyItNow ? a.buyitnow :
-			 * a.currentPrice); if (getConfig().contains(a.owner.toString() +
-			 * ".offlineAmount")) i += getConfig().getDouble(a.owner.toString() +
-			 * ".offlineAmount"); getConfig().set(a.owner.toString() + ".offlineAmount", i);
-			 * saveConfig(); }
-			 * 
-			 * 
-			 * 
-			 * e.getWhoClicked().getInventory().addItem(aa.is); if (aa.lastBid != null) {
-			 * econ.depositPlayer(Bukkit.getOfflinePlayer(aa.lastBid), aa.currentPrice); if
-			 * (Bukkit.getPlayer(aa.lastBid) != null) Bukkit.getPlayer(aa.lastBid)
-			 * .sendMessage(prefix + s_auctionCancelRefund .replace("%amount%", "" +
-			 * aa.currentPrice).replace("%item%", (aa.is.getItemMeta().hasDisplayName() ?
-			 * aa.is.getItemMeta().getDisplayName() : aa.is.getType().name()) + ".x." +
-			 * aa.is.getAmount())); } auctions.remove(aa); getConfig().set("Auctions." +
-			 * aa.owner.toString() + "." + aa.auctionID, null); saveConfig();
-			 */
 			sender.sendMessage(Main.prefix + " Ending all auctions");
 		} else if (args[0].equalsIgnoreCase("endAllAuctions")) {
 			if (!sender.hasPermission("npcauctions.endall"))
