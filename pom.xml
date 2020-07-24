@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>me.zombie_striker</groupId>
 	<artifactId>NPCAuctions</artifactId>
-	<version>1.0.63</version>
+	<version>1.0.64</version>
 	<repositories>
 		<repository>
 			<id>spigot-repo</id>

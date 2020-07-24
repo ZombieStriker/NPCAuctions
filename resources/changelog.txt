@@ -1,3 +1,7 @@
+1.0.64
+    Updated to 1.16
+    Fixed buy it now increasing amount purchased
+
 1.0.63
     Updated to 1.15.2
     Cleaned-up code.

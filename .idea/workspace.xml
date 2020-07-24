@@ -3,12 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="b3bd36a4-67b2-4bc9-8e26-6180272d0088" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/changelog.txt" beforeDir="false" afterPath="$PROJECT_DIR$/resources/changelog.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/zombie_striker/npcauctions/GithubDependDownloader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/me/zombie_striker/npcauctions/GithubDependDownloader.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/zombie_striker/npcauctions/GithubUpdater.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/me/zombie_striker/npcauctions/GithubUpdater.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/zombie_striker/npcauctions/NPCAuctionCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/me/zombie_striker/npcauctions/NPCAuctionCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/me/zombie_striker/npcauctions/VillagerAuction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/me/zombie_striker/npcauctions/VillagerAuction.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -120,6 +114,30 @@
       <screen x="0" y="0" width="1920" height="1160" />
     </state>
     <state x="765" y="288" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1160@0.0.1920.1160" timestamp="1580601230673" />
+    <state x="740" y="296" key="FileChooserDialogImpl" timestamp="1581985136817">
+      <screen x="0" y="0" width="1920" height="1160" />
+    </state>
+    <state x="740" y="296" key="FileChooserDialogImpl/0.0.1920.1160@0.0.1920.1160" timestamp="1581985136817" />
+    <state width="1876" height="316" key="GridCell.Tab.0.bottom" timestamp="1580613328290">
+      <screen x="0" y="0" width="1920" height="1160" />
+    </state>
+    <state width="1876" height="316" key="GridCell.Tab.0.bottom/0.0.1920.1160@0.0.1920.1160" timestamp="1580613328290" />
+    <state width="1876" height="316" key="GridCell.Tab.0.center" timestamp="1580613328290">
+      <screen x="0" y="0" width="1920" height="1160" />
+    </state>
+    <state width="1876" height="316" key="GridCell.Tab.0.center/0.0.1920.1160@0.0.1920.1160" timestamp="1580613328290" />
+    <state width="1876" height="316" key="GridCell.Tab.0.left" timestamp="1580613328290">
+      <screen x="0" y="0" width="1920" height="1160" />
+    </state>
+    <state width="1876" height="316" key="GridCell.Tab.0.left/0.0.1920.1160@0.0.1920.1160" timestamp="1580613328290" />
+    <state width="1876" height="316" key="GridCell.Tab.0.right" timestamp="1580613328290">
+      <screen x="0" y="0" width="1920" height="1160" />
+    </state>
+    <state width="1876" height="316" key="GridCell.Tab.0.right/0.0.1920.1160@0.0.1920.1160" timestamp="1580613328290" />
+    <state x="342" y="281" key="new project wizard" timestamp="1581985159685">
+      <screen x="0" y="0" width="1920" height="1160" />
+    </state>
+    <state x="342" y="281" key="new project wizard/0.0.1920.1160@0.0.1920.1160" timestamp="1581985159685" />
   </component>
   <component name="masterDetails">
     <states>

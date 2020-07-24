@@ -936,7 +936,7 @@ public class Main extends JavaPlugin implements Listener {
 										}
 										if (aa.lastBid != null) {
 											OfflinePlayer ofp = Bukkit.getOfflinePlayer(aa.lastBid);
-											econ.depositPlayer(ofp, aa.buyitnow);
+											econ.depositPlayer(ofp, aa.biddingPrice);
 											if (ofp.isOnline()) {
 												((Player) ofp).sendMessage(prefix + s_outBid.replace("%item%",
 														(aa.is.getItemMeta().hasDisplayName()
